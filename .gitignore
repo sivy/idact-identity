@@ -1,0 +1,5 @@
+# os x ish
+.DS_Store
+
+# python poop
+*.pyc
