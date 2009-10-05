@@ -20,6 +20,9 @@ import cgi
 import util
 from util import getViewURL
 
+import logging
+from pprint import pprint, pformat
+
 from django import http
 from django.views.generic.simple import direct_to_template
 
@@ -31,6 +34,8 @@ from openid.consumer.discover import OPENID_IDP_2_0_TYPE
 from openid.extensions import sreg
 from openid.extensions import pape
 from openid.fetchers import HTTPFetchingError
+
+log = logging.getLogger(__name__)
 
 def getOpenIDStore():
     """
@@ -112,6 +117,7 @@ def endpoint(request):
         openid_request = s.decodeRequest(query)
     except ProtocolError, why:
         # This means the incoming request was invalid.
+        log.debug(query)
         return direct_to_template(
             request,
             'server/endpoint.html',
@@ -267,6 +273,7 @@ def displayResponse(request, openid_response):
     except EncodingError, why:
         # If it couldn't be encoded, display an error.
         text = why.response.encodeToKVForm()
+        log.debug(cgi.escape(text))
         return direct_to_template(
             request,
             'server/endpoint.html',
