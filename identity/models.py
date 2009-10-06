@@ -4,6 +4,7 @@ import re
 import time
 
 from django.db import models
+import openid.association
 from openid.consumer import consumer
 from openid.extensions import sreg, ax
 from openid.store import interface, nonce
