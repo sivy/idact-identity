@@ -39,11 +39,13 @@ def getOpenIDStore():
     """
     return util.getOpenIDStore('/tmp/djopenid_s_store', 's_')
 
+
 def getServer(request):
     """
     Get a Server object to perform OpenID authentication.
     """
     return Server(getOpenIDStore(), request.build_absolute_uri(reverse(endpoint)))
+
 
 def server(request):
     """
@@ -52,11 +54,12 @@ def server(request):
     return direct_to_template(
         request,
         'server/index.html',
-        {'user_url': request.build_absolute_uri(reverse(idPage)),
-         'server_xrds_url': request.build_absolute_uri(reverse(idpXrds)),
+        {'user_url': request.build_absolute_uri(reverse(id_page)),
+         'server_xrds_url': request.build_absolute_uri(reverse(idp_xrds)),
          })
 
-def idpXrds(request):
+
+def idp_xrds(request):
     """
     Respond to requests for the IDP's XRDS document, which is used in
     IDP-driven identifier selection.
@@ -64,7 +67,8 @@ def idpXrds(request):
     return util.renderXRDS(
         request, [OPENID_IDP_2_0_TYPE], [request.build_absolute_uri(reverse(endpoint))])
 
-def idPage(request):
+
+def id_page(request):
     """
     Serve the identity page for OpenID URLs.
     """
@@ -73,7 +77,8 @@ def idPage(request):
         'server/idPage.html',
         {'server_url': request.build_absolute_uri(reverse(endpoint))})
 
-def trustPage(request):
+
+def trust_page(request):
     """
     Display the trust page template, which allows the user to decide
     whether to approve the OpenID verification.
@@ -81,7 +86,8 @@ def trustPage(request):
     return direct_to_template(
         request,
         'server/trust.html',
-        {'trust_handler_url':request.build_absolute_uri(reverse(processTrustResult))})
+        {'trust_handler_url':request.build_absolute_uri(reverse(process_trust_result))})
+
 
 def endpoint(request):
     """
@@ -120,7 +126,8 @@ def endpoint(request):
         openid_response = s.handleRequest(openid_request)
         return displayResponse(request, openid_response)
 
-def handleCheckIDRequest(request, openid_request):
+
+def handle_checkid_request(request, openid_request):
     """
     Handle checkid_* requests.  Get input from the user to find out
     whether she trusts the RP involved.  Possibly, get intput about
@@ -134,7 +141,7 @@ def handleCheckIDRequest(request, openid_request):
     # what URL should be sent.
     if not openid_request.idSelect():
 
-        id_url = request.build_absolute_uri(reverse(idPage))
+        id_url = request.build_absolute_uri(reverse(id_page))
 
         # Confirm that this server can actually vouch for that
         # identifier
@@ -164,7 +171,8 @@ def handleCheckIDRequest(request, openid_request):
             request.session['openid_request'] = None
         return showDecidePage(request, openid_request)
 
-def showDecidePage(request, openid_request):
+
+def show_decide_page(request, openid_request):
     """
     Render a page to the user so a trust decision can be made.
 
@@ -188,12 +196,13 @@ def showDecidePage(request, openid_request):
         request,
         'server/trust.html',
         {'trust_root': trust_root,
-         'trust_handler_url':request.build_absolute_uri(reverse(processTrustResult)),
+         'trust_handler_url':request.build_absolute_uri(reverse(process_trust_result)),
          'trust_root_valid': trust_root_valid,
          'pape_request': pape_request,
          })
 
-def processTrustResult(request):
+
+def process_trust_result(request):
     """
     Handle the result of a trust decision and respond to the RP
     accordingly.
@@ -203,7 +212,7 @@ def processTrustResult(request):
     openid_request = request.session.get('openid_request')
 
     # The identifier that this server can vouch for
-    response_identity = request.build_absolute_uri(reverse(idPage))
+    response_identity = request.build_absolute_uri(reverse(id_page))
 
     # If the decision was to allow the verification, respond
     # accordingly.
@@ -240,7 +249,8 @@ def processTrustResult(request):
         
     return displayResponse(request, openid_response)
 
-def displayResponse(request, openid_response):
+
+def display_response(request, openid_response):
     """
     Display an OpenID response.  Errors will be displayed directly to
     the user; successful responses and other protocol-level messages
