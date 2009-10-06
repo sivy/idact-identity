@@ -17,12 +17,9 @@ Some code conventions used here:
 
 import cgi
 
-import util
-from util import getViewURL
-
 from django import http
+from django.core.urlresolvers import reverse
 from django.views.generic.simple import direct_to_template
-
 from openid.server.server import Server, ProtocolError, CheckIDRequest, \
      EncodingError
 from openid.server.trustroot import verifyReturnTo
@@ -31,6 +28,9 @@ from openid.consumer.discover import OPENID_IDP_2_0_TYPE
 from openid.extensions import sreg
 from openid.extensions import pape
 from openid.fetchers import HTTPFetchingError
+
+import util
+
 
 def getOpenIDStore():
     """
@@ -43,7 +43,7 @@ def getServer(request):
     """
     Get a Server object to perform OpenID authentication.
     """
-    return Server(getOpenIDStore(), getViewURL(request, endpoint))
+    return Server(getOpenIDStore(), request.build_absolute_uri(reverse(endpoint)))
 
 def setRequest(request, openid_request):
     """
@@ -67,8 +67,8 @@ def server(request):
     return direct_to_template(
         request,
         'server/index.html',
-        {'user_url': getViewURL(request, idPage),
-         'server_xrds_url': getViewURL(request, idpXrds),
+        {'user_url': request.build_absolute_uri(reverse(idPage)),
+         'server_xrds_url': request.build_absolute_uri(reverse(idpXrds)),
          })
 
 def idpXrds(request):
@@ -77,7 +77,7 @@ def idpXrds(request):
     IDP-driven identifier selection.
     """
     return util.renderXRDS(
-        request, [OPENID_IDP_2_0_TYPE], [getViewURL(request, endpoint)])
+        request, [OPENID_IDP_2_0_TYPE], [request.build_absolute_uri(reverse(endpoint))])
 
 def idPage(request):
     """
@@ -86,7 +86,7 @@ def idPage(request):
     return direct_to_template(
         request,
         'server/idPage.html',
-        {'server_url': getViewURL(request, endpoint)})
+        {'server_url': request.build_absolute_uri(reverse(endpoint))})
 
 def trustPage(request):
     """
@@ -96,7 +96,7 @@ def trustPage(request):
     return direct_to_template(
         request,
         'server/trust.html',
-        {'trust_handler_url':getViewURL(request, processTrustResult)})
+        {'trust_handler_url':request.build_absolute_uri(reverse(processTrustResult))})
 
 def endpoint(request):
     """
@@ -149,7 +149,7 @@ def handleCheckIDRequest(request, openid_request):
     # what URL should be sent.
     if not openid_request.idSelect():
 
-        id_url = getViewURL(request, idPage)
+        id_url = request.build_absolute_uri(reverse(idPage))
 
         # Confirm that this server can actually vouch for that
         # identifier
@@ -200,7 +200,7 @@ def showDecidePage(request, openid_request):
         request,
         'server/trust.html',
         {'trust_root': trust_root,
-         'trust_handler_url':getViewURL(request, processTrustResult),
+         'trust_handler_url':request.build_absolute_uri(reverse(processTrustResult)),
          'trust_root_valid': trust_root_valid,
          'pape_request': pape_request,
          })
@@ -215,7 +215,7 @@ def processTrustResult(request):
     openid_request = getRequest(request)
 
     # The identifier that this server can vouch for
-    response_identity = getViewURL(request, idPage)
+    response_identity = request.build_absolute_uri(reverse(idPage))
 
     # If the decision was to allow the verification, respond
     # accordingly.
