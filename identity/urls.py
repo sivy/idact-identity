@@ -1,12 +1,19 @@
 
 from django.conf.urls.defaults import *
 
-urlpatterns = patterns(
-    'identity.views',
-    (r'^$', 'server'),
-    (r'^xrds/$', 'idpXrds'),
-    (r'^processTrustResult/$', 'processTrustResult'),
-    (r'^user/$', 'idPage'),
+urlpatterns = patterns('identity.views',
+    url(r'^$', 'home', name='home'),
+    url(r'^logged_in$', 'logged_in'),
+    url(r'^user/(?P<username>.*)$', 'profile', name='profile'),
+    url(r'^register$', 'register', name='register'),
+)
+
+
+# OpenID views
+
+urlpatterns += patterns('identity.views',
+    (r'^xrds/$', 'idp_xrds'),
+    (r'^processTrustResult/$', 'process_trust_result'),
     (r'^endpoint/$', 'endpoint'),
-    (r'^trust/$', 'trustPage'),
+    (r'^trust/$', 'trust_page'),
 )

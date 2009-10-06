@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load idact %}
+
+{% block head %}
+    <meta http-equiv="x-xrds-location" content="{% absoluteurl %}{% url identity.views.idp_xrds %}{% endabsoluteurl %}">
+{% endblock %}
+
+{% block body %}
+    <div class="span-24 last">
+        <h1>Welcome!</h1>
+
+        <p>This is the identity server. Would you kindly <a href="{% url django.contrib.auth.views.login %}">sign in</a> or <a href="{% url register %}">register</a>?</p>
+  </div>
+{% endblock %}

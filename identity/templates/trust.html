@@ -1,4 +1,4 @@
-{% extends "server/index.html" %}
+{% extends "base.html" %}
 
 {% block body %}
 
@@ -7,7 +7,7 @@
   <p>The site <tt>{{ trust_root|escape }}</tt> has requested verification
   of your OpenID.</p>
 
-  {% include "server/pape_request_info.html" %}
+  {% include "pape_request_info.html" %}
 {% endifequal %}
 {% ifequal trust_root_valid "Invalid" %}
 <div class="error">
@@ -32,7 +32,7 @@
   and ask <tt>{{ trust_root|escape }}</tt> to implement relying party
   verification for your future transactions.</p>
 
-  {% include "server/pape_request_info.html" %}
+  {% include "pape_request_info.html" %}
 {% endifequal %}
 
 <!-- trust_root_valid is {{ trust_root_valid }} -->

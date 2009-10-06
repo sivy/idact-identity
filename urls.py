@@ -11,11 +11,13 @@ urlpatterns = patterns('',
     # Example:
     # (r'^idact/', include('idact.foo.urls')),
 
-    url(r'^server/', include('identity.urls')),
+    url(r'^', include('identity.urls')),
 
     url(r'^static/(?P<path>.*)$', 'django.views.static.serve',
         {'document_root': join(dirname(__file__), 'static')},
         name='static'),
+
+    url(r'^accounts/', include('django.contrib.auth.urls')),
 
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:
