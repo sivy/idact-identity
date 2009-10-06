@@ -32,7 +32,7 @@ from openid.server.trustroot import verifyReturnTo
 from openid.yadis.constants import YADIS_CONTENT_TYPE
 from openid.yadis.discover import DiscoveryFailure
 
-from identity.models import OpenIDStore
+from identity.models import Profile, OpenIDStore
 
 
 def home(request):
@@ -239,17 +239,23 @@ def process_trust_result(request):
 
     # Send Simple Registration data in the response, if appropriate.
     if allowed:
+        user = request.user
         sreg_data = {
-            'fullname': 'Example User',
-            'nickname': 'example',
-            'dob': '1970-01-01',
-            'email': 'invalid@example.com',
-            'gender': 'F',
-            'postcode': '12345',
-            'country': 'ES',
-            'language': 'eu',
-            'timezone': 'America/New_York',
-            }
+            'nickname': user.username,
+            'email':    user.email,
+        }
+        if user.first_name or user.last_name:
+            sreg_data['fullname'] = ' '.join((user.first_name, user_last_name)).strip()
+
+        try:
+            user_profile = user.get_profile()
+        except Profile.DoesNotExist:
+            pass
+        else:
+            for fld in ('dob', 'gender', 'postcode', 'country', 'language', 'timezone'):
+                value = getattr(user_profile, fld, None)
+                if value is not None:
+                    sreg_data[fld] = value
 
         sreg_req = sreg.SRegRequest.fromOpenIDRequest(openid_request)
         sreg_resp = sreg.SRegResponse.extractResponse(sreg_req, sreg_data)

@@ -89,6 +89,8 @@ INSTALLED_APPS = (
 
 LOGIN_REDIRECT_URL = '/logged_in'
 
+AUTH_PROFILE_MODULE = 'identity.Profile'
+
 
 import logging
 logging.basicConfig(level=logging.DEBUG)

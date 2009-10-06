@@ -3,6 +3,7 @@ import logging
 import re
 import time
 
+from django.contrib.auth.models import User
 from django.db import models
 import openid.association
 from openid.consumer import consumer
@@ -11,6 +12,17 @@ from openid.store import interface, nonce
 
 
 log = logging.getLogger(__name__)
+
+
+class Profile(models.Model):
+
+    user = models.ForeignKey(User, unique=True)
+    dob = models.DateField()
+    gender = models.CharField(max_length=1)
+    postcode = models.CharField(max_length=10)
+    country = models.CharField(max_length=2)
+    language = models.CharField(max_length=3)
+    timezone = models.CharField(max_length=50)
 
 
 # OpenID models
