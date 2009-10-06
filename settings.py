@@ -77,3 +77,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'identity'
 )
+
+
+import logging
+logging.basicConfig(level=logging.DEBUG)
