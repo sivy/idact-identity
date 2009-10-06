@@ -138,6 +138,7 @@ def endpoint(request):
         return display_response(request, openid_response)
 
 
+@login_required
 def handle_checkid_request(request, openid_request):
     """
     Handle checkid_* requests.  Get input from the user to find out
@@ -152,7 +153,8 @@ def handle_checkid_request(request, openid_request):
     # what URL should be sent.
     if not openid_request.idSelect():
 
-        id_url = request.build_absolute_uri(reverse(id_page))
+        id_url = reverse(profile, kwargs={'username': request.user.username})
+        id_url = request.build_absolute_uri(id_url)
 
         # Confirm that this server can actually vouch for that
         # identifier
@@ -225,7 +227,7 @@ def process_trust_result(request):
 
     # The identifier that this server can vouch for
     my_url = reverse(profile, kwargs={'username': request.user.username})
-    response_identity = request.build_absolute_uri()
+    response_identity = request.build_absolute_uri(my_url)
 
     # If the decision was to allow the verification, respond
     # accordingly.
