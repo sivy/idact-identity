@@ -87,6 +87,8 @@ INSTALLED_APPS = (
     'identity'
 )
 
+SESSION_COOKIE_NAME = 'identity_sessionid'
+
 LOGIN_REDIRECT_URL = '/logged_in'
 
 AUTH_PROFILE_MODULE = 'identity.Profile'
