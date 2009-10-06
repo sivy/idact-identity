@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html><head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Django OpenID Example Server</title>
+    <link rel="stylesheet" type="text/css" href="{% url static path="ply.css" %}">
+    <style type="text/css">
+        body { font-size: 1.6em; }
+        div.message, div.error {
+            background: #9f9;
+            padding: 0.5em;
+            margin-top: 0.5em;
+            margin-bottom: 0.5em;
+            border: 1px solid #555;
+            font-weight: bold;
+        }
+        div.error {
+            background: #f99;
+        }
+        div.box {
+            background: #eee;
+            border: 1px solid black;
+            padding: 1em;
+        }
+    </style>
+
+    {% block head %}{% endblock %}
+</head><body>
+
+    <div class="grid">
+    {% block body %}
+    {% endblock %}
+    </div>
+
+</body></html>

@@ -1,36 +1,8 @@
-<html>
-  <head>
-    <title>Django OpenID Example Server</title>
-    <style type="text/css">
-    div.message {
-        background: #9f9;
-        padding: 0.5em;
-        margin-top: 0.5em;
-        margin-bottom: 0.5em;
-        border: 1px solid #555;
-        font-weight: bold;
-    }
+{% extends "base.html" %}
 
-    div.error {
-        background: #f99;
-        padding: 0.5em;
-        margin-top: 0.5em;
-        margin-bottom: 0.5em;
-        border: 1px solid #555;
-        font-weight: bold;
-    }
-
-    div.box {
-        background: #eee;
-        border: 1px solid black;
-        padding: 1em;
-    }
-    </style>
-    {% block head %}
+{% block head %}
     <meta http-equiv="x-xrds-location" content="{{ server_xrds_url }}">
-    {% endblock %}
-  </head>
-  <body>
+{% endblock %}
 
 {% block body %}
   <div class="box">
@@ -47,5 +19,3 @@
 
   </div>
 {% endblock %}
-  </body>
-</html>
