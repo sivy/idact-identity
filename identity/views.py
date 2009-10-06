@@ -20,17 +20,16 @@ import cgi
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.views.generic.simple import direct_to_template
-from openid.server.server import Server, ProtocolError, CheckIDRequest, \
-     EncodingError
-from openid.server.trustroot import verifyReturnTo
-from openid.yadis.discover import DiscoveryFailure
 from openid.consumer.discover import OPENID_IDP_2_0_TYPE
 from openid.extensions import sreg
 from openid.extensions import pape
 from openid.fetchers import HTTPFetchingError
+from openid.server.server import Server, ProtocolError, CheckIDRequest, EncodingError
+from openid.server.trustroot import verifyReturnTo
+from openid.yadis.constants import YADIS_CONTENT_TYPE
+from openid.yadis.discover import DiscoveryFailure
 
 from identity.models import OpenIDStore
-import util
 
 
 def getServer(request):
@@ -57,8 +56,14 @@ def idp_xrds(request):
     Respond to requests for the IDP's XRDS document, which is used in
     IDP-driven identifier selection.
     """
-    return util.renderXRDS(
-        request, [OPENID_IDP_2_0_TYPE], [request.build_absolute_uri(reverse(endpoint))])
+    return direct_to_template(
+        request,
+        'xrds.xml',
+        {
+            'type_uris': [OPENID_IDP_2_0_TYPE],
+            'endpoint_urls': [request.build_absolute_uri(reverse(endpoint))],
+        },
+    )
 
 
 def id_page(request):
