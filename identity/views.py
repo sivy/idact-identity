@@ -25,7 +25,7 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.views.generic.simple import direct_to_template
 from openid.consumer.discover import OPENID_IDP_2_0_TYPE
-from openid.extensions import sreg, pape
+from openid.extensions import sreg, pape, ax
 from openid.fetchers import HTTPFetchingError
 from openid.server.server import Server, ProtocolError, CheckIDRequest, EncodingError
 from openid.server.trustroot import verifyReturnTo
@@ -204,6 +204,8 @@ def show_decide_page(request, openid_request):
         trust_root_valid = "Unreachable"
 
     pape_request = pape.Request.fromOpenIDRequest(openid_request)
+    ax_request = ax.FetchRequest.fromOpenIDRequest(openid_request)
+    ax_has_activity_callback = ax_request.has_key('http://schema.activitystrea.ms/activity/callback')
 
     return direct_to_template(
         request,
@@ -212,6 +214,8 @@ def show_decide_page(request, openid_request):
          'trust_handler_url':request.build_absolute_uri(reverse(process_trust_result)),
          'trust_root_valid': trust_root_valid,
          'pape_request': pape_request,
+         'ax_request': ax_request,
+         'ax_has_activity_callback': 1
          })
 
 
