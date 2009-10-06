@@ -38,7 +38,7 @@ def server(request):
     """
     return direct_to_template(
         request,
-        'server/index.html',
+        'index.html',
         {'user_url': request.build_absolute_uri(reverse(id_page)),
          'server_xrds_url': request.build_absolute_uri(reverse(idp_xrds)),
          })
@@ -65,7 +65,7 @@ def id_page(request):
     """
     return direct_to_template(
         request,
-        'server/idPage.html',
+        'idPage.html',
         {'server_url': request.build_absolute_uri(reverse(endpoint))})
 
 
@@ -76,7 +76,7 @@ def trust_page(request):
     """
     return direct_to_template(
         request,
-        'server/trust.html',
+        'trust.html',
         {'trust_handler_url':request.build_absolute_uri(reverse(process_trust_result))})
 
 
@@ -96,7 +96,7 @@ def endpoint(request):
         # This means the incoming request was invalid.
         return direct_to_template(
             request,
-            'server/endpoint.html',
+            'endpoint.html',
             {'error': str(why)})
 
     # If we did not get a request, display text indicating that this
@@ -104,7 +104,7 @@ def endpoint(request):
     if openid_request is None:
         return direct_to_template(
             request,
-            'server/endpoint.html',
+            'endpoint.html',
             {})
 
     # We got a request; if the mode is checkid_*, we will handle it by
@@ -185,7 +185,7 @@ def show_decide_page(request, openid_request):
 
     return direct_to_template(
         request,
-        'server/trust.html',
+        'trust.html',
         {'trust_root': trust_root,
          'trust_handler_url':request.build_absolute_uri(reverse(process_trust_result)),
          'trust_root_valid': trust_root_valid,
@@ -258,7 +258,7 @@ def display_response(request, openid_response):
         text = why.response.encodeToKVForm()
         return direct_to_template(
             request,
-            'server/endpoint.html',
+            'endpoint.html',
             {'error': cgi.escape(text)})
 
     # Construct the appropriate django framework response.

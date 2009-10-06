@@ -11,7 +11,7 @@ urlpatterns = patterns('',
     # Example:
     # (r'^idact/', include('idact.foo.urls')),
 
-    url(r'^server/', include('identity.urls')),
+    url(r'^', include('identity.urls')),
 
     url(r'^static/(?P<path>.*)$', 'django.views.static.serve',
         {'document_root': join(dirname(__file__), 'static')},
