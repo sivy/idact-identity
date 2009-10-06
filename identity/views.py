@@ -17,8 +17,8 @@ Some code conventions used here:
 
 import cgi
 
-from django import http
 from django.core.urlresolvers import reverse
+from django.http import HttpResponse
 from django.views.generic.simple import direct_to_template
 from openid.server.server import Server, ProtocolError, CheckIDRequest, \
      EncodingError
@@ -273,7 +273,7 @@ def displayResponse(request, openid_response):
             {'error': cgi.escape(text)})
 
     # Construct the appropriate django framework response.
-    r = http.HttpResponse(webresponse.body)
+    r = HttpResponse(webresponse.body)
     r.status_code = webresponse.code
 
     for header, value in webresponse.headers.iteritems():
