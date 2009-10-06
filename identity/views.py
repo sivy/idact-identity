@@ -29,22 +29,15 @@ from openid.extensions import sreg
 from openid.extensions import pape
 from openid.fetchers import HTTPFetchingError
 
+from identity.models import OpenIDStore
 import util
-
-
-def getOpenIDStore():
-    """
-    Return an OpenID store object fit for the currently-chosen
-    database backend, if any.
-    """
-    return util.getOpenIDStore('/tmp/djopenid_s_store', 's_')
 
 
 def getServer(request):
     """
     Get a Server object to perform OpenID authentication.
     """
-    return Server(getOpenIDStore(), request.build_absolute_uri(reverse(endpoint)))
+    return Server(OpenIDStore(), request.build_absolute_uri(reverse(endpoint)))
 
 
 def server(request):
@@ -119,12 +112,12 @@ def endpoint(request):
     # We got a request; if the mode is checkid_*, we will handle it by
     # getting feedback from the user or by checking the session.
     if openid_request.mode in ["checkid_immediate", "checkid_setup"]:
-        return handleCheckIDRequest(request, openid_request)
+        return handle_checkid_request(request, openid_request)
     else:
         # We got some other kind of OpenID request, so we let the
         # server handle this.
         openid_response = s.handleRequest(openid_request)
-        return displayResponse(request, openid_response)
+        return display_response(request, openid_response)
 
 
 def handle_checkid_request(request, openid_request):
@@ -169,7 +162,7 @@ def handle_checkid_request(request, openid_request):
             request.session['openid_request'] = openid_request
         else:
             request.session['openid_request'] = None
-        return showDecidePage(request, openid_request)
+        return show_decide_page(request, openid_request)
 
 
 def show_decide_page(request, openid_request):
@@ -247,7 +240,7 @@ def process_trust_result(request):
         ### @TODO: Add AX response with activityCallback if requested
         ### @TODO: how to tell if it's in the request?
         
-    return displayResponse(request, openid_response)
+    return display_response(request, openid_response)
 
 
 def display_response(request, openid_response):
