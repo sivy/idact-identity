@@ -45,21 +45,6 @@ def getServer(request):
     """
     return Server(getOpenIDStore(), request.build_absolute_uri(reverse(endpoint)))
 
-def setRequest(request, openid_request):
-    """
-    Store the openid request information in the session.
-    """
-    if openid_request:
-        request.session['openid_request'] = openid_request
-    else:
-        request.session['openid_request'] = None
-
-def getRequest(request):
-    """
-    Get an openid request from the session, if any.
-    """
-    return request.session.get('openid_request')
-
 def server(request):
     """
     Respond to requests for the server's primary web page.
@@ -173,7 +158,10 @@ def handleCheckIDRequest(request, openid_request):
     else:
         # Store the incoming request object in the session so we can
         # get to it later.
-        setRequest(request, openid_request)
+        if openid_request:
+            request.session['openid_request'] = openid_request
+        else:
+            request.session['openid_request'] = None
         return showDecidePage(request, openid_request)
 
 def showDecidePage(request, openid_request):
@@ -212,7 +200,7 @@ def processTrustResult(request):
     """
     # Get the request from the session so we can construct the
     # appropriate response.
-    openid_request = getRequest(request)
+    openid_request = request.session.get('openid_request')
 
     # The identifier that this server can vouch for
     response_identity = request.build_absolute_uri(reverse(idPage))
