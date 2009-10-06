@@ -32,13 +32,6 @@ from openid.yadis.discover import DiscoveryFailure
 from identity.models import OpenIDStore
 
 
-def getServer(request):
-    """
-    Get a Server object to perform OpenID authentication.
-    """
-    return Server(OpenIDStore(), request.build_absolute_uri(reverse(endpoint)))
-
-
 def server(request):
     """
     Respond to requests for the server's primary web page.
@@ -91,7 +84,7 @@ def endpoint(request):
     """
     Respond to low-level OpenID protocol messages.
     """
-    s = getServer(request)
+    s = Server(OpenIDStore(), request.build_absolute_uri(reverse(endpoint)))
 
     query = request.GET or request.POST
 
@@ -255,7 +248,7 @@ def display_response(request, openid_response):
     will be sent using the proper mechanism (i.e., direct response,
     redirection, etc.).
     """
-    s = getServer(request)
+    s = Server(OpenIDStore(), request.build_absolute_uri(reverse(endpoint)))
 
     # Encode the response into something that is renderable.
     try:
