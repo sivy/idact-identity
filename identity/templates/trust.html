@@ -8,6 +8,7 @@
   of your OpenID.</p>
 
   {% include "pape_request_info.html" %}
+  {% include "ax_request_info.html" %}
 {% endifequal %}
 {% ifequal trust_root_valid "Invalid" %}
 <div class="error">
@@ -33,6 +34,7 @@
   verification for your future transactions.</p>
 
   {% include "pape_request_info.html" %}
+  {% include "ax_request_info.html" %}
 {% endifequal %}
 
 <!-- trust_root_valid is {{ trust_root_valid }} -->
