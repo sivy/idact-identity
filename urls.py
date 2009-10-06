@@ -17,6 +17,8 @@ urlpatterns = patterns('',
         {'document_root': join(dirname(__file__), 'static')},
         name='static'),
 
+    url(r'^accounts/', include('django.contrib.auth.urls')),
+
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),

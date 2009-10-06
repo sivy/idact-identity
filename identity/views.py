@@ -17,12 +17,15 @@ Some code conventions used here:
 
 import cgi
 
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404, HttpResponseRedirect
+from django.shortcuts import render_to_response
+from django.template import RequestContext
 from django.views.generic.simple import direct_to_template
 from openid.consumer.discover import OPENID_IDP_2_0_TYPE
-from openid.extensions import sreg
-from openid.extensions import pape
+from openid.extensions import sreg, pape
 from openid.fetchers import HTTPFetchingError
 from openid.server.server import Server, ProtocolError, CheckIDRequest, EncodingError
 from openid.server.trustroot import verifyReturnTo
@@ -32,17 +35,44 @@ from openid.yadis.discover import DiscoveryFailure
 from identity.models import OpenIDStore
 
 
-def server(request):
+def home(request):
     """
     Respond to requests for the server's primary web page.
     """
-    return direct_to_template(
-        request,
+    return render_to_response(
         'index.html',
-        {'user_url': request.build_absolute_uri(reverse(id_page)),
-         'server_xrds_url': request.build_absolute_uri(reverse(idp_xrds)),
-         })
+        {},
+        context_instance=RequestContext(request),
+    )
 
+
+def profile(request, username):
+    """
+    Serve the identity page for OpenID URLs.
+    """
+    try:
+        user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        raise Http404
+    return render_to_response(
+        'profile.html',
+        {
+            'profile_user': user,
+        },
+        context_instance=RequestContext(request),
+    )
+
+
+@login_required
+def logged_in(request):
+    return HttpResponseRedirect(reverse('profile', kwargs={'username': request.user.username}))
+
+
+def register(request):
+    raise NotImplementedError
+
+
+# OpenID views
 
 def idp_xrds(request):
     """
@@ -57,16 +87,6 @@ def idp_xrds(request):
             'endpoint_urls': [request.build_absolute_uri(reverse(endpoint))],
         },
     )
-
-
-def id_page(request):
-    """
-    Serve the identity page for OpenID URLs.
-    """
-    return direct_to_template(
-        request,
-        'idPage.html',
-        {'server_url': request.build_absolute_uri(reverse(endpoint))})
 
 
 def trust_page(request):
@@ -193,6 +213,7 @@ def show_decide_page(request, openid_request):
          })
 
 
+@login_required
 def process_trust_result(request):
     """
     Handle the result of a trust decision and respond to the RP
@@ -203,7 +224,8 @@ def process_trust_result(request):
     openid_request = request.session.get('openid_request')
 
     # The identifier that this server can vouch for
-    response_identity = request.build_absolute_uri(reverse(id_page))
+    my_url = reverse(profile, kwargs={'username': request.user.username})
+    response_identity = request.build_absolute_uri()
 
     # If the decision was to allow the verification, respond
     # accordingly.

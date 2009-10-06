@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load idact %}
+
+{% block head %}
+<!-- We should be able to space-separate both rel values in one attribute,
+     but some older OpenID implementations don't parse that. -->
+<link rel="openid.server" href="{% absoluteurl %}{% url identity.views.endpoint %}{% endabsoluteurl %}">
+<link rel="openid2.provider" href="{% absoluteurl %}{% url identity.views.endpoint %}{% endabsoluteurl %}">
+{% endblock %}
+
+{% block body %}
+
+    <div class="span-24">
+        <h1>
+            {% if profile_user.name %}
+                {{ profile_user.name }}
+            {% else %}
+                {{ profile_user.username }}
+            {% endif %}
+        </h1>
+
+        <p>{% absoluteurl %}{% url profile username=profile_user.username %}{% endabsoluteurl %}</p>
+    </div>
+
+{% endblock %}

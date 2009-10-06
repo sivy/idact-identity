@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+    <div class="span-8 prefix-8 box">
+        <form method="post" action="{% url django.contrib.auth.views.login %}">
+            <input type="hidden" name="next" value="{{ next }}">
+            {{ form.as_p }}
+            <p><input type="submit" value="Sign in"></p>
+        </form>
+    </div>
+
+{% endblock %}
