@@ -195,28 +195,29 @@ def show_decide_page(request, openid_request):
     return_to = openid_request.return_to
 
     try:
-        # Stringify because template's ifequal can only compare to strings.
-        trust_root_valid = verifyReturnTo(trust_root, return_to) \
-                           and "Valid" or "Invalid"
-    except DiscoveryFailure, err:
-        trust_root_valid = "DISCOVERY_FAILED"
-    except HTTPFetchingError, err:
-        trust_root_valid = "Unreachable"
+        trust_root_validity = ('trust_root_valid'
+            if verifyReturnTo(trust_root, return_to)
+            else 'trust_root_invalid')
+    except DiscoveryFailure:
+        trust_root_validity = 'trust_root_undiscovered'
+    except HTTPFetchingError:
+        trust_root_validity = 'trust_root_unreachable'
 
     pape_request = pape.Request.fromOpenIDRequest(openid_request)
     ax_request = ax.FetchRequest.fromOpenIDRequest(openid_request)
-    ax_has_activity_callback = ax_request.has_key('http://schema.activitystrea.ms/activity/callback')
+    if ax_request.has_key('http://schema.activitystrea.ms/activity/callback'):
+        ax_request.has_activity_callback = True
 
-    return direct_to_template(
-        request,
+    return render_to_response(
         'trust.html',
-        {'trust_root': trust_root,
-         'trust_handler_url':request.build_absolute_uri(reverse(process_trust_result)),
-         'trust_root_valid': trust_root_valid,
-         'pape_request': pape_request,
-         'ax_request': ax_request,
-         'ax_has_activity_callback': 1
-         })
+        {
+            'trust_root': trust_root,
+            trust_root_validity: True,
+            'pape_request': pape_request,
+            'ax_request': ax_request,
+        },
+        context_instance=RequestContext(request),
+    )
 
 
 @login_required

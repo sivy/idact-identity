@@ -1,21 +1,21 @@
 {% if pape_request %}
-  {% if pape_request.preferred_auth_policies %}
-    The relying party requested the following PAPE policies be in effect:
+    {% if pape_request.preferred_auth_policies %}
+        <p>{{ trust_root }} has requested that we use the following authentication policies:</p>
 
-    <ul>
-    {% for uri in pape_request.preferred_auth_policies %}
-    <li>{{ uri }}</li>
-    {% endfor %}
-    </ul>
-  {% endif %}
+        {% for uri in pape_request.preferred_auth_policies %}
+            {% if forloop.first %}<ul>{% endif %}
+            <li>{{ uri }}</li>
+            {% if forloop.last %}</ul>{% endif %}
+        {% endfor %}
+    {% endif %}
 
-  {% if pape_request.preferred_auth_level_types %}
-    The relying party requested the following authentication level types:
+    {% if pape_request.preferred_auth_level_types %}
+        <p>{{ trust_root }} requested authentication of the following level types:</p>
 
-    <ul>
-    {% for uri in pape_request.preferred_auth_level_types %}
-    <li>{{ uri }}</li>
-    {% endfor %}
-    </ul>
-  {% endif %}
+        {% for uri in pape_request.preferred_auth_level_types %}
+            {% if forloop.first %}<ul>{% endif %}
+            <li>{{ uri }}</li>
+            {% if forloop.last %}</ul>{% endif %}
+        {% endfor %}
+    {% endif %}
 {% endif %}
