@@ -248,7 +248,7 @@ def process_trust_result(request):
             'email':    user.email,
         }
         if user.first_name or user.last_name:
-            sreg_data['fullname'] = ' '.join((user.first_name, user_last_name)).strip()
+            sreg_data['fullname'] = ' '.join((user.first_name, user.last_name)).strip()
 
         try:
             user_profile = user.get_profile()
