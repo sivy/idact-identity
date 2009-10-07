@@ -24,6 +24,47 @@ class Profile(models.Model):
     language = models.CharField(max_length=3)
     timezone = models.CharField(max_length=50)
 
+    def as_sreg_data(self, share_email=False):
+        user = self.user
+        sreg_data = {
+            'nickname': user.username,
+        }
+        if user.first_name or user.last_name:
+            sreg_data['fullname'] = ' '.join((user.first_name, user.last_name)).strip()
+
+        if share_email:
+            sreg_data['email'] = user.email
+
+        for fld in ('dob', 'gender', 'postcode', 'country', 'language', 'timezone'):
+            sreg_data[fld] = getattr(self, fld, None)
+
+        return sreg_data
+
+    def as_ax_data(self, share_email=False):
+        user = self.user
+        ax_data = {
+            'http://axschema.org/namePerson/first': user.first_name,
+            'http://axschema.org/namePerson/last': user.last_name
+        }
+
+        if share_email:
+            ax_data['http://axschema.org/contact/email'] = user.email
+
+        return ax_data
+
+
+class SaveActivityHookToken(models.Model):
+
+    user = models.ForeignKey(User)
+    token = models.CharField(max_length=20)
+    time = models.DateTimeField(auto_now_add=True)
+
+    def save(self, force_insert=False, force_update=False):
+        if self.token is None:
+            self.token = ''.join(choice(TOKEN_CHARS) for i in range(20))
+        super(SaveActivityHookToken, self).save(force_insert=force_insert,
+            force_update=force_update)
+
 
 # OpenID models
 
@@ -37,9 +78,10 @@ class Association(models.Model):
     lifetime = models.IntegerField()
     assoc_type = models.CharField(max_length=500)
 
-    def save(self):
+    def save(self, force_insert=False, force_update=False):
         self.expires = self.issued + self.lifetime
-        super(Association, self).save()
+        super(Association, self).save(force_insert=force_insert,
+            force_update=force_update)
 
     def as_openid_association(self):
         return openid.association.Association(

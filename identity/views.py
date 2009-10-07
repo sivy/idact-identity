@@ -72,6 +72,12 @@ def register(request):
     raise NotImplementedError
 
 
+def save_activity_hook(request):
+    token = request.GET['token']
+    feed_url = request.GET['feed']
+    raise NotImplementedError
+
+
 # OpenID views
 
 def idp_xrds(request):
@@ -242,31 +248,45 @@ def process_trust_result(request):
 
     # Send Simple Registration data in the response, if appropriate.
     if allowed:
-        user = request.user
-        sreg_data = {
-            'nickname': user.username,
-            'email':    user.email,
-        }
-        if user.first_name or user.last_name:
-            sreg_data['fullname'] = ' '.join((user.first_name, user.last_name)).strip()
-
         try:
-            user_profile = user.get_profile()
+            user_profile = request.user.get_profile()
         except Profile.DoesNotExist:
-            pass
-        else:
-            for fld in ('dob', 'gender', 'postcode', 'country', 'language', 'timezone'):
-                value = getattr(user_profile, fld, None)
-                if value is not None:
-                    sreg_data[fld] = value
+            user_profile = Profile(user=request.user)
+
+        sreg_data = user_profile.as_sreg_data()
+        ax_data = user_profile.as_ax_data()
+
+        # We only got share_activity if show_decide_page() found the AX
+        # request asked for the callback, so we can do heavy work like
+        # saving a token.
+        if 'share_activity' in request.POST:
+            token = SaveActivityHookToken(user=request.user)
+            token.save()
+            cb_params = {
+                'token': token.token,
+                'feed_uri': '{feed_uri}'
+            }
+
+            def uritemplatesegment(k, v):
+                return '%s=%s' % (k, quote(v, '{}'))
+            def uritemplateencode(seq):
+                return '&'.join(uritemplatesegment(k, v) for k, v in seq.items())
+            callback = '%s?%s' % (request.build_absolute_uri(
+                reverse('save_activity_hook')), uritemplateencode(cb_params))
+
+            ax_data['http://schema.activitystrea.ms/activity/callback'] = callback
 
         sreg_req = sreg.SRegRequest.fromOpenIDRequest(openid_request)
         sreg_resp = sreg.SRegResponse.extractResponse(sreg_req, sreg_data)
         openid_response.addExtension(sreg_resp)
-        
-        ### @TODO: Add AX response with activityCallback if requested
-        ### @TODO: how to tell if it's in the request?
-        
+
+        ax_req = ax.FetchRequest.fromOpenIDRequest(openid_request)
+        ax_resp = ax.FetchResponse(ax_req)
+        for uri, value in ax_data.items():
+            if value:
+                ax_resp.addValue(uri, value)
+        openid_response.addExtension(ax_resp)
+
     return display_response(request, openid_response)
 
 
