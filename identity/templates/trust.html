@@ -2,52 +2,56 @@
 
 {% block body %}
 
-{% ifequal trust_root_valid "Valid" %}
-  <!-- Trust root has been validated by OpenID 2 mechanism. -->
-  <p>The site <tt>{{ trust_root|escape }}</tt> has requested verification
-  of your OpenID.</p>
+    <div class="span-15">
 
-  {% include "pape_request_info.html" %}
-  {% include "ax_request_info.html" %}
-{% endifequal %}
-{% ifequal trust_root_valid "Invalid" %}
-<div class="error">
-  <p>This request claims to be from {{ trust_root|escape }} but I have 
-  determined that <em>it is a pack of lies</em>.  Beware, if you release
-  information to them, they are likely to do unconscionable things with it,
-  being the lying liars that they are.</p>
-  <p>Please tell the <em>real</em> {{ trust_root|escape }} that someone is
-  trying to abuse your trust in their good name.</p>
-</div>
-{% endifequal %}
-{% ifequal trust_root_valid "Unreachable" %}
-  <p>The site <tt>{{ trust_root|escape }}</tt> has requested verification
-  of your OpenID.  I have failed to reach it and thus cannot vouch for its
-  authenticity.  Perhaps it is on your local network.</p>
-{% endifequal %}
-{% ifequal trust_root_valid "DISCOVERY_FAILED" %}
-  <p>The site <tt>{{ trust_root|escape }}</tt> has requested verification
-  of your OpenID.  However, <tt>{{ trust_root|escape }}</tt> does not 
-  implement OpenID 2.0's relying party verification mechanism.  Please use
-  extra caution in deciding whether to release information to this party,
-  and ask <tt>{{ trust_root|escape }}</tt> to implement relying party
-  verification for your future transactions.</p>
+    {% if trust_root_invalid or trust_root_unreachable %}
+        <h3>Unverified sign-in request</h3>
 
-  {% include "pape_request_info.html" %}
-  {% include "ax_request_info.html" %}
-{% endifequal %}
+        <div class="error">
+            <p>A web site claiming to be {{ trust_root }} wanted you to
+            sign in, but its identity could not be verified.</p>
 
-<!-- trust_root_valid is {{ trust_root_valid }} -->
+            {% if trust_root_invalid %}
+                <p>The site at {{ trust_root }} couldn't verify the request.</p>
+            {% else %}
+                <p>The site at {{ trust_root }} couldn't be reached to verify the request.</p>
+            {% endif %}
+        </div>
 
-<div>
-<form method="post"
-      action="{{ trust_handler_url }}">
-  Verify your identity to the relying party?
+        <form method="post" action="{% url identity.views.process_trust_result %}">
+            <input type="submit" value="Return to {{ trust_root }}" name="cancel" />
+        </form>
+    {% endif %}
 
-  <br/>
-  <input type="submit" value="Yes (Allow)" name="allow" />
-  <input type="submit" value="No (Cancel)" name="cancel" />
-</form>
-</div>
+    {% if trust_root_valid or trust_root_undiscovered %}
+        <h3>Sign in to {{ trust_root }}</h3>
+
+        <div class="yay">
+            <!-- Trust root has been validated by OpenID 2 mechanism. -->
+            <p>The site <tt>{{ trust_root }}</tt> has requested verification
+            of your OpenID.</p>
+
+            {% if trust_root_undiscovered %}
+                <p>(The site at {{ trust_root }} couldn't verify for us that
+                it made the request. Make sure when using {{ trust_root }} that you're
+                contacting the real {{ trust_root }} web site.)</p>
+            {% endif %}
+        </div>
+
+        {% include "pape_request_info.html" %}
+        {% include "ax_request_info.html" %}
+
+        <form method="post" action="{% url identity.views.process_trust_result %}">
+            <p>Sign in to {{ trust_root }}?</p>
+
+            <p>
+                <input type="submit" value="Yes, sign in" name="allow">
+                <input type="submit" value="No, cancel" name="cancel">
+            </p>
+        </form>
+
+    {% endif %}
+
+    </div>
 
 {% endblock %}

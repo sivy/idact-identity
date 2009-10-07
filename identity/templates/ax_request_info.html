@@ -1,7 +1,12 @@
-{% if ax_request %}
-  {% if ax_has_activity_callback %}
-    <p>The relying party indicated that it can provide activity updates to this community. Would you like to share your activities with your followers on this community?<br>
-    <label><input type="checkbox" value="1" checked="checked" /> Yes!</label>
-    </p>
-  {% endif %}
+{% if ax_request and ax_request.has_activity_callback %}
+    <h3>Share activity?</h3>
+
+    <p>The relying party indicated that it can provide activity updates to
+    this community. Would you like to share your activities with your
+    followers on this community?</p>
+
+    <p><label>
+        <input type="checkbox" name="share_activity" value="share" checked="checked" />
+        Yes, share my activity
+    </label></p>
 {% endif %}
