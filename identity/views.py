@@ -25,7 +25,7 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.views.generic.simple import direct_to_template
 from openid.consumer.discover import OPENID_IDP_2_0_TYPE
-from openid.extensions import sreg, pape, ax
+from openid.extensions import sreg, ax
 from openid.fetchers import HTTPFetchingError
 from openid.server.server import Server, ProtocolError, CheckIDRequest, EncodingError
 from openid.server.trustroot import verifyReturnTo
@@ -203,7 +203,6 @@ def show_decide_page(request, openid_request):
     except HTTPFetchingError:
         trust_root_validity = 'trust_root_unreachable'
 
-    pape_request = pape.Request.fromOpenIDRequest(openid_request)
     ax_request = ax.FetchRequest.fromOpenIDRequest(openid_request)
     if ax_request.has_key('http://schema.activitystrea.ms/activity/callback'):
         ax_request.has_activity_callback = True
@@ -213,7 +212,6 @@ def show_decide_page(request, openid_request):
         {
             'trust_root': trust_root,
             trust_root_validity: True,
-            'pape_request': pape_request,
             'ax_request': ax_request,
         },
         context_instance=RequestContext(request),
@@ -265,10 +263,6 @@ def process_trust_result(request):
         sreg_req = sreg.SRegRequest.fromOpenIDRequest(openid_request)
         sreg_resp = sreg.SRegResponse.extractResponse(sreg_req, sreg_data)
         openid_response.addExtension(sreg_resp)
-
-        pape_response = pape.Response()
-        pape_response.setAuthLevel(pape.LEVELS_NIST, 0)
-        openid_response.addExtension(pape_response)
         
         ### @TODO: Add AX response with activityCallback if requested
         ### @TODO: how to tell if it's in the request?
