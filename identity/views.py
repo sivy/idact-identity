@@ -72,9 +72,8 @@ def register(request):
     raise NotImplementedError
 
 
-def save_activity_hook(request):
-    token = request.GET['token']
-    feed_url = request.GET['feed']
+def save_activity_hook(request, token):
+    feed_uri = request.POST['feed_uri']
     raise NotImplementedError
 
 
@@ -262,18 +261,8 @@ def process_trust_result(request):
         if 'share_activity' in request.POST:
             token = SaveActivityHookToken(user=request.user)
             token.save()
-            cb_params = {
-                'token': token.token,
-                'feed_uri': '{feed_uri}'
-            }
-
-            def uritemplatesegment(k, v):
-                return '%s=%s' % (k, quote(v, '{}'))
-            def uritemplateencode(seq):
-                return '&'.join(uritemplatesegment(k, v) for k, v in seq.items())
-            callback = '%s?%s' % (request.build_absolute_uri(
-                reverse('save_activity_hook')), uritemplateencode(cb_params))
-
+            callback = reverse('identity.views.save_activity_hook',
+                kwargs={'token': token.token})
             ax_data['http://schema.activitystrea.ms/activity/callback'] = callback
 
         sreg_req = sreg.SRegRequest.fromOpenIDRequest(openid_request)

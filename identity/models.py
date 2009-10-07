@@ -1,6 +1,8 @@
 from base64 import b64encode, b64decode
 import logging
+from random import choice
 import re
+import string
 import time
 
 from django.contrib.auth.models import User
@@ -12,6 +14,9 @@ from openid.store import interface, nonce
 
 
 log = logging.getLogger(__name__)
+
+
+TOKEN_CHARS = string.letters + string.digits + string.digits
 
 
 class Profile(models.Model):
@@ -60,7 +65,7 @@ class SaveActivityHookToken(models.Model):
     time = models.DateTimeField(auto_now_add=True)
 
     def save(self, force_insert=False, force_update=False):
-        if self.token is None:
+        if not self.token:
             self.token = ''.join(choice(TOKEN_CHARS) for i in range(20))
         super(SaveActivityHookToken, self).save(force_insert=force_insert,
             force_update=force_update)
