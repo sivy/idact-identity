@@ -106,7 +106,7 @@ def save_activity_hook(request, token):
                 resp.reason)
 
         feed = ElementTree.fromstring(content)
-
+        log.debug(content)
         # "feed" is already the root feed element, so look for the links
         # it contains.
         feed_links = feed.findall('{http://www.w3.org/2005/Atom}link')
@@ -150,6 +150,7 @@ def save_activity_hook(request, token):
         return error("Could not save activity hook for %r due to invalid token %r",
             feed_uri, token)
     except Exception, exc:
+        log.exception(exc)
         return error("Could not save activity hook for %r due to %s: %s",
             feed_uri, type(exc).__name__, str(exc))
 
