@@ -58,17 +58,36 @@ class Profile(models.Model):
         return ax_data
 
 
-class SaveActivityHookToken(models.Model):
+# Activity stream hook models
+
+class UserTokenModel(models.Model):
 
     user = models.ForeignKey(User)
     token = models.CharField(max_length=20)
-    time = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def generate_token(self):
+        if not self.token:
+            self.token = ''.join(choice(TOKEN_CHARS) for i in range(20))
 
     def save(self, force_insert=False, force_update=False):
         if not self.token:
-            self.token = ''.join(choice(TOKEN_CHARS) for i in range(20))
-        super(SaveActivityHookToken, self).save(force_insert=force_insert,
+            self.generate_token()
+        super(UserTokenModel, self).save(force_insert=force_insert,
             force_update=force_update)
+
+    class Meta:
+        abstract = True
+
+
+class SaveActivityHookToken(UserTokenModel):
+
+    pass
+
+
+class ActivitySubscription(UserTokenModel):
+
+    feed_uri = models.CharField(max_length=500)
 
 
 # OpenID models

@@ -6,7 +6,13 @@ urlpatterns = patterns('identity.views',
     url(r'^logged_in$', 'logged_in'),
     url(r'^user/(?P<username>.*)$', 'profile', name='profile'),
     url(r'^register$', 'register', name='register'),
+)
+
+
+# Activity stream hook views
+urlpatterns += patterns('identity.views',
     url(r'^save_activity_hook/(?P<token>[^/]+)$', 'save_activity_hook'),
+    url(r'^new_activity/(?P<token>[^/]+)$', 'new_activity'),
 )
 
 

@@ -16,7 +16,10 @@ Some code conventions used here:
 """
 
 import cgi
+from functools import wraps
 import logging
+from urllib import urlencode
+from xml.etree import ElementTree
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -25,6 +28,7 @@ from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.views.generic.simple import direct_to_template
+import httplib2
 from openid.consumer.discover import OPENID_IDP_2_0_TYPE
 from openid.extensions import sreg, ax
 from openid.fetchers import HTTPFetchingError
@@ -33,7 +37,7 @@ from openid.server.trustroot import verifyReturnTo
 from openid.yadis.constants import YADIS_CONTENT_TYPE
 from openid.yadis.discover import DiscoveryFailure
 
-from identity.models import Profile, SaveActivityHookToken, OpenIDStore
+from identity.models import Profile, ActivitySubscription, SaveActivityHookToken, OpenIDStore
 
 
 log = logging.getLogger(__name__)
@@ -76,8 +80,84 @@ def register(request):
     raise NotImplementedError
 
 
+# Activity stream hook views
+
 def save_activity_hook(request, token):
-    feed_uri = request.POST['feed_uri']
+    log.debug('Hello from save_activity_hook!')
+
+    def error(msg, *args):
+        return HttpResponse(msg % args, status=400, content_type='text/plain')
+
+    try:
+        feed_uri = request.POST['feed_uri']
+    except KeyError:
+        return error("Could not save activity hook: no feed_uri parameter to save")
+
+    # Verify that that's a valid token.
+    try:
+        token_obj = SaveActivityHookToken.objects.get(token=token)
+
+        # Yay, a feed! Find the feed's hub URL.
+        h = httplib2.Http()
+        resp, content = h.request(feed_uri)
+        if resp.status != 200:
+            return error("Could not save activity hook for %r: got an HTTP %d %s"
+                " response trying to fetch it", feed_uri, resp.status,
+                resp.reason)
+
+        feed = ElementTree.fromstring(content)
+
+        # "feed" is already the root feed element, so look for the links
+        # it contains.
+        feed_links = feed.findall('{http://www.w3.org/2005/Atom}link')
+        if feed_links is None:
+            return error("Could not save activity hook for %r: feed has no links", feed_uri)
+        feed_links_by_rel = dict((link.get('rel'), link) for link in feed_links)
+
+        if 'self' not in feed_links_by_rel:
+            return error("Could not save activity hook for %r: feed has no self link", feed_uri)
+        if 'hub' not in feed_links_by_rel:
+            return error("Could not save activity hook for %r: feed has no hub link", feed_uri)
+
+        self_uri = feed_links_by_rel['self'].get('href')
+        hub_uri = feed_links_by_rel['hub'].get('href')
+
+        # Done enough to think we subscribed (and generate the sub token).
+        sub = ActivitySubscription(
+            user=token_obj.user,
+            feed_uri=self_uri,
+        )
+        sub.save()
+
+        # SUBSCRIBE
+        callback_url = reverse('identity.views.new_activity',
+            kwargs={'token': sub.token})
+        callback_url = request.build_absolute_uri(callback_url)
+        sub_params = {
+            'hub.mode': 'subscribe',
+            'hub.topic': self_uri,
+            'hub.callback': callback_url,
+            'hub.verify': 'async',
+        }
+        resp, content = h.request(hub_uri, method="POST",
+            body=urlencode(sub_params))
+        if resp.status not in (202, 204):
+            return error("Could not save activity hook for %r: subscription"
+                " wasn't accepted by pubsub hub and i feel like sharing")
+
+        token_obj.delete()
+    except SaveActivityHookToken.DoesNotExist:
+        return error("Could not save activity hook for %r due to invalid token %r",
+            feed_uri, token)
+    except Exception, exc:
+        return error("Could not save activity hook for %r due to %s: %s",
+            feed_uri, type(exc).__name__, str(exc))
+
+    # If you say so, boss!
+    return HttpResponse("HOK!", content_type='text/plain')
+
+
+def new_activity(request, token):
     raise NotImplementedError
 
 
