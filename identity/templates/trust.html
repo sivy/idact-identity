@@ -38,9 +38,9 @@
             {% endif %}
         </div>
 
-        {% include "ax_request_info.html" %}
-
         <form method="post" action="{% url identity.views.process_trust_result %}">
+            {% include "ax_request_info.html" %}
+
             <p>Sign in to {{ trust_root }}?</p>
 
             <p>

@@ -16,6 +16,7 @@ Some code conventions used here:
 """
 
 import cgi
+import logging
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -32,7 +33,10 @@ from openid.server.trustroot import verifyReturnTo
 from openid.yadis.constants import YADIS_CONTENT_TYPE
 from openid.yadis.discover import DiscoveryFailure
 
-from identity.models import Profile, OpenIDStore
+from identity.models import Profile, SaveActivityHookToken, OpenIDStore
+
+
+log = logging.getLogger(__name__)
 
 
 def home(request):
@@ -263,7 +267,11 @@ def process_trust_result(request):
             token.save()
             callback = reverse('identity.views.save_activity_hook',
                 kwargs={'token': token.token})
+            callback = request.build_absolute_uri(callback)
             ax_data['http://schema.activitystrea.ms/activity/callback'] = callback
+            log.debug('Adding %r to AX response as callback', callback)
+        else:
+            log.debug('User chose not to share activity, so not sending callback')
 
         sreg_req = sreg.SRegRequest.fromOpenIDRequest(openid_request)
         sreg_resp = sreg.SRegResponse.extractResponse(sreg_req, sreg_data)
