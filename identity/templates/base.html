@@ -38,6 +38,11 @@
             border: 1px solid black;
             padding: 1em;
         }
+        p.footer {
+            display: block;
+            clear: both;
+            padding: 50px 10px 10px;
+        }
     </style>
 
     {% block head %}{% endblock %}
@@ -57,5 +62,9 @@
         {% block body %}
         {% endblock %}
     </div>
+
+    <p class="footer">
+        this project's source can be found on <a href="http://github.com/sivy/idact-identity">Github</a>.
+    </p>
 
 </body></html>
