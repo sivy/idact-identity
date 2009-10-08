@@ -213,7 +213,7 @@ def show_decide_page(request, openid_request):
         trust_root_validity = 'trust_root_unreachable'
 
     ax_request = ax.FetchRequest.fromOpenIDRequest(openid_request)
-    if ax_request.has_key('http://schema.activitystrea.ms/activity/callback'):
+    if ax_request and ax_request.has_key('http://schema.activitystrea.ms/activity/callback'):
         ax_request.has_activity_callback = True
 
     return render_to_response(
