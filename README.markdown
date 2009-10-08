@@ -8,4 +8,4 @@ An identity provider sample application that comprises half of a proof-of-concep
 
 * httplib2
 * Spawning
-** Run the app via `spawn --factory=spawning.django_factory.config_factory settings --port 8001`
+    * Run the app via `spawn --factory=spawning.django_factory.config_factory settings --port XXXX`
