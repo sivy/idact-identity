@@ -24,7 +24,7 @@ from xml.etree import ElementTree
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse, Http404, HttpResponseRedirect
+from django.http import HttpResponse, Http404, HttpResponseRedirect, HttpResponseNotFound
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.views.generic.simple import direct_to_template
@@ -158,6 +158,25 @@ def save_activity_hook(request, token):
 
 
 def new_activity(request, token):
+
+    if request.method == 'GET':
+        success = HttpResponse(request.GET['hub.challenge'])
+        failure = HttpResponseNotFound()
+
+        topic = request.GET['hub.topic']
+        subscription_exists = True if ActivitySubscription.objects.filter(
+            feed_uri=topic, token=token).count() > 0 else False
+
+        mode = request.GET['hub.mode']
+        if mode == 'subscribe':
+            return success if subscription_exists else failure
+        elif mode == 'unsubscribe':
+            return failure if subscription_exists else success
+
+        return HttpResponse("Unknown hub mode %r" % mode, status=400,
+            content_type='text/plain')
+
+    # Handle new content!
     raise NotImplementedError
 
 
