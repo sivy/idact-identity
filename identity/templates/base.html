@@ -11,8 +11,16 @@
             padding-top:0;
         }
         h1.title {
-            padding:0;
-            margin: 10px 0 10px 10px;
+            padding: 0;
+            margin: 10px 0 0 0;
+            background: url({% url static path="identity_title.png" %}) no-repeat -1px 0;
+            height: 46px;
+        }
+        h1.title span {
+            visibility: hidden;
+        }
+        .title-icon img {
+            margin: 17px 0 0 0;
         }
         div.message, div.error {
             background: #9f9;
@@ -35,10 +43,19 @@
     {% block head %}{% endblock %}
 </head>
 <body>
-    <h1 class="title"><img src="/static/identity_title.png" title="identity/activity" /></h1>
+
     <div class="grid">
-    {% block body %}
-    {% endblock %}
+        <div class="span-1 title-icon">
+            <img src="{% url static path="bread_aqua_32.png" %}" width="32" height="32" alt="">
+        </div>
+        <div class="span-23 last">
+            <h1 class="title"><span>Identity</span></h1>
+        </div>
+    </div>
+
+    <div class="grid">
+        {% block body %}
+        {% endblock %}
     </div>
 
 </body></html>
