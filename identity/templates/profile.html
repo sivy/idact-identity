@@ -8,7 +8,7 @@
 <link rel="openid2.provider" href="{% absoluteurl %}{% url identity.views.endpoint %}{% endabsoluteurl %}">
 {% endblock %}
 
-{% block body %}
+{% block content %}
 
     <div class="span-24">
         <h1>
@@ -18,6 +18,8 @@
                 {{ profile_user.username }}
             {% endif %}
         </h1>
+
+        {{ block.super }}
 
         <p>{% absoluteurl %}{% url profile username=profile_user.username %}{% endabsoluteurl %}</p>
 

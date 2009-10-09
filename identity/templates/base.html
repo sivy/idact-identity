@@ -77,7 +77,14 @@
         </div>
 
         <div class="grid">
-            {% block body %}
+            {% block content %}
+                {% if flash %}
+                    {% for key, message in flash.items %}
+                        <div class="span-24 last flash-message flash-{{ key }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
             {% endblock %}
         </div>
     </div>

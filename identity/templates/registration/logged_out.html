@@ -1,11 +1,15 @@
 {% extends "base.html" %}
 
-{% block body %}
+{% block content %}
+
     <div class="span-24">
         <h1>Sorry to see you go!</h1>
+
+        {{ block.super }}
 
         <p>Come back soon!</p>
 
         <p><a href="{% url home %}">Back to home</a></p>
     </div>
+
 {% endblock %}

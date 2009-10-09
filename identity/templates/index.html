@@ -5,10 +5,12 @@
     <meta http-equiv="x-xrds-location" content="{% absoluteurl %}{% url identity.views.idp_xrds %}{% endabsoluteurl %}">
 {% endblock %}
 
-{% block body %}
+{% block content %}
     <div class="span-24 last">
         <h1>Welcome!</h1>
 
+        {{ block.super }}
+
         <p>This is the identity server. Would you kindly <a href="{% url django.contrib.auth.views.login %}">sign in</a> or <a href="{% url register %}">register</a>?</p>
-  </div>
+    </div>
 {% endblock %}
