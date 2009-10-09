@@ -112,7 +112,22 @@ def register(request):
 
 @login_required
 def edit_profile(request):
-    raise NotImplementedError
+    if request.method == 'POST':
+        form = ProfileForm(request.POST)
+        if form.is_valid():
+            form.save()
+            request.flash.put(message="Your changes have been saved.")
+            return HttpResponseRedirect(reverse('home'))
+    else:
+        form = ProfileForm()
+
+    return render_to_response(
+        'registration/edit_profile.html',
+        {
+            'form': form,
+        },
+        context_instance=RequestContext(request),
+    )
 
 
 # Activity stream hook views
