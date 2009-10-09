@@ -96,6 +96,7 @@ def register(request):
             new_user = authenticate(username=form.cleaned_data['username'],
                 password=form.cleaned_data['password1'])
             login(request, new_user)
+            request.flash.put(message="Congratulations, you've registered!")
             return HttpResponseRedirect(reverse('identity.views.edit_profile'))
     else:
         form = UserCreationForm()
