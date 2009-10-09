@@ -23,6 +23,7 @@ from xml.etree import ElementTree
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, Http404, HttpResponseRedirect, HttpResponseNotFound
 from django.shortcuts import render_to_response
@@ -37,6 +38,7 @@ from openid.server.trustroot import verifyReturnTo
 from openid.yadis.constants import YADIS_CONTENT_TYPE
 from openid.yadis.discover import DiscoveryFailure
 
+from identity.forms import UserCreationForm, ProfileForm
 from identity.models import Profile, ActivitySubscription, SaveActivityHookToken, OpenIDStore
 
 
@@ -87,6 +89,28 @@ def logged_in(request):
 
 @login_verboten
 def register(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            new_user = authenticate(username=form.cleaned_data['username'],
+                password=form.cleaned_data['password1'])
+            login(request, new_user)
+            return HttpResponseRedirect(reverse('identity.views.edit_profile'))
+    else:
+        form = UserCreationForm()
+
+    return render_to_response(
+        'registration/register.html',
+        {
+            'form': form,
+        },
+        context_instance=RequestContext(request),
+    )
+
+
+@login_required
+def edit_profile(request):
     raise NotImplementedError
 
 

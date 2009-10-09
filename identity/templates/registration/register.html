@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div class="span-24">
+        <h1>Register</h1>
+
+        <form method="POST" action="{% url register %}">
+            {{ form.as_p }}
+            <p><input type="submit" value="Register"></p>
+        </form>
+    </div>
+
+{% endblock %}
