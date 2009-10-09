@@ -2,60 +2,7 @@
 <html><head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>identity/activity {% block pagetitle %}Identity Server{% endblock %}</title>
-    <link rel="stylesheet" type="text/css" href="{% url static path="ply.css" %}">
-    <style type="text/css">
-        body, html {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }
-        body { 
-            font-size: 1.6em; 
-        }
-        h1.title {
-            padding: 0;
-            margin: 10px 0 0 0;
-        }
-        .title-icon img {
-            margin: 17px 0 0 0;
-        }
-        div.message, div.error, ul.errorlist {
-            background: #9f9;
-            padding: 0.5em;
-            margin: 0.5em 0;
-            border: 1px solid #555;
-            font-weight: bold;
-        }
-        div.error, ul.errorlist {
-            background: #f99;
-        }
-        div.box {
-            background: #eee;
-            border: 1px solid black;
-            padding: 1em;
-        }
-        #banner {
-            border-top: 12px solid #69c2e3;
-        }
-        #page {
-            min-height: 100%;
-            margin: 0 auto -100px;
-            padding: 0;
-        }
-        #not-a-footer {
-            clear: both;
-            height: 100px;
-        }
-        #footer {
-            display: block;
-            height: 38px;
-            z-index: 4;
-            overflow: visible;
-            border-bottom: 12px solid #69c2e3;
-            margin: 50px auto 0;
-            padding: 0;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="{% url static path="style.css" %}">
 
     {% block head %}{% endblock %}
 </head>
