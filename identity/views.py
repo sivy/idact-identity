@@ -43,6 +43,15 @@ from identity.models import Profile, ActivitySubscription, SaveActivityHookToken
 log = logging.getLogger(__name__)
 
 
+def login_verboten(fn):
+    @wraps(fn)
+    def test(request, *args, **kwargs):
+        if request.user.is_authenticated():
+            return HttpResponseRedirect(reverse('home'))
+        return fn(request, *args, **kwargs)
+    return test
+
+
 def home(request):
     """
     Respond to requests for the server's primary web page.
@@ -76,6 +85,7 @@ def logged_in(request):
     return HttpResponseRedirect(reverse('profile', kwargs={'username': request.user.username}))
 
 
+@login_verboten
 def register(request):
     raise NotImplementedError
 
