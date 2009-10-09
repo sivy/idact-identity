@@ -22,12 +22,12 @@ TOKEN_CHARS = string.letters + string.digits + string.digits
 class Profile(models.Model):
 
     user = models.ForeignKey(User, unique=True)
-    dob = models.DateField()
-    gender = models.CharField(max_length=1)
-    postcode = models.CharField(max_length=10)
-    country = models.CharField(max_length=2)
-    language = models.CharField(max_length=3)
-    timezone = models.CharField(max_length=50)
+    dob = models.DateField(blank=True, null=True)
+    gender = models.CharField(max_length=1, blank=True)
+    postcode = models.CharField(max_length=10, blank=True)
+    country = models.CharField(max_length=2, blank=True)
+    language = models.CharField(max_length=3, blank=True)
+    timezone = models.CharField(max_length=50, blank=True)
 
     def as_sreg_data(self, share_email=False):
         user = self.user
