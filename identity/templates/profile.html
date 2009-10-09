@@ -12,8 +12,8 @@
 
     <div class="span-24">
         <h1>
-            {% if profile_user.name %}
-                {{ profile_user.name }}
+            {% if profile_user.first_name %}
+                {{ profile_user.first_name }} {{ profile_user.last_name }}
             {% else %}
                 {{ profile_user.username }}
             {% endif %}
@@ -23,7 +23,16 @@
 
         <p>{% absoluteurl %}{% url profile username=profile_user.username %}{% endabsoluteurl %}</p>
 
-        <p>This is an OpenID!</p>
+        {% ifequal user profile_user %}
+            <p>This is <strong>your</strong> OpenID! Would you like to:</p>
+
+            <ul>
+                <li><a href="{% url identity.views.edit_profile %}">Edit your profile</a></li>
+                <li><a href="{% url django.contrib.auth.views.logout %}">Sign out</a></li>
+            </ul>
+        {% else %}
+            <p>This is an OpenID!</p>
+        {% endifequal %}
     </div>
 
 {% endblock %}

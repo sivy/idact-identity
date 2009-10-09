@@ -58,6 +58,10 @@ def home(request):
     """
     Respond to requests for the server's primary web page.
     """
+    if request.user.is_authenticated():
+        return HttpResponseRedirect(reverse('profile',
+            kwargs={'username': request.user.username}))
+
     return render_to_response(
         'index.html',
         {},
