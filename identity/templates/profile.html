@@ -33,6 +33,15 @@
         {% else %}
             <p>This is an OpenID!</p>
         {% endifequal %}
+
+        <h2>Activity</h2>
+
+        {% for act in profile_user.activity_set.all %}
+            {% if forloop.first %}<ul>{% endif %}
+            <li>{{ act.text }} <a class="arrow" href="{{ act.link }}">&#10148;</a></li>
+            {% if forloop.last %}</ul>{% endif %}
+        {% endfor %}
+
     </div>
 
 {% endblock %}

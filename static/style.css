@@ -37,6 +37,14 @@ div.box {
     padding: 1em;
 }
 
+a.arrow:link, a.arrow:visited, a.arrow:active {
+    text-decoration: none;
+}
+
+a.arrow:hover {
+    text-decoration: underline;
+}
+
 #banner {
     border-top: 12px solid #69c2e3;
 }
