@@ -19,7 +19,7 @@ h1.title {
     margin: 17px 0 0 0;
 }
 
-div.message, div.error, ul.errorlist {
+div.flash-message, div.flash-error, ul.errorlist {
     background: #9f9;
     padding: 0.5em;
     margin: 0.5em 0;
