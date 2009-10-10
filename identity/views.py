@@ -39,7 +39,7 @@ from openid.yadis.constants import YADIS_CONTENT_TYPE
 from openid.yadis.discover import DiscoveryFailure
 
 from identity.forms import UserCreationForm, UserForm, ProfileForm
-from identity.models import Profile, ActivitySubscription, SaveActivityHookToken, OpenIDStore
+from identity.models import Profile, Activity, ActivitySubscription, SaveActivityHookToken, OpenIDStore
 
 
 log = logging.getLogger(__name__)
@@ -240,8 +240,16 @@ def new_activity(request, token):
         return HttpResponse("Unknown hub mode %r" % mode, status=400,
             content_type='text/plain')
 
-    # Handle new content!
-    raise NotImplementedError
+    feed = ElementTree.fromstring(request.raw_post_data)
+    entries = feed.findall('{http://www.w3.org/2005/Atom}entry')
+    if entries is None:
+        raise ValueError('No entries in this feed')
+    for entry in entries:
+        act = Activity.from_atom_entry(entry, request)
+        if not act.pk:
+            act.save()
+
+    return HttpResponse('HOK!', content_type='text/plain')
 
 
 # OpenID views
