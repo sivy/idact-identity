@@ -2,69 +2,44 @@
 <html><head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>identity/activity {% block pagetitle %}Identity Server{% endblock %}</title>
-    <link rel="stylesheet" type="text/css" href="{% url static path="ply.css" %}">
-    <style type="text/css">
-        body { 
-            font-size: 1.6em; 
-            border-top:12px solid #69c2e3;
-            margin-top:0;
-            padding-top:0;
-        }
-        h1.title {
-            padding: 0;
-            margin: 10px 0 0 0;
-            background: url({% url static path="identity_title.png" %}) no-repeat -1px 0;
-            height: 46px;
-        }
-        h1.title span {
-            visibility: hidden;
-        }
-        .title-icon img {
-            margin: 17px 0 0 0;
-        }
-        div.message, div.error {
-            background: #9f9;
-            padding: 0.5em;
-            margin-top: 0.5em;
-            margin-bottom: 0.5em;
-            border: 1px solid #555;
-            font-weight: bold;
-        }
-        div.error {
-            background: #f99;
-        }
-        div.box {
-            background: #eee;
-            border: 1px solid black;
-            padding: 1em;
-        }
-        p.footer {
-            display: block;
-            clear: both;
-            padding: 50px 10px 10px;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="{% url static path="style.css" %}">
 
     {% block head %}{% endblock %}
 </head>
 <body>
 
-    <div class="grid">
-        <div class="span-1 title-icon">
-            <img src="{% url static path="bread_aqua_32.png" %}" width="32" height="32" alt="">
+    <div id="page">
+        <div id="banner">
+            <div class="grid">
+                <div class="span-1 title-icon">
+                    <a href="{% url home %}"><img src="{% url static path="bread_aqua_32.png" %}" width="32" height="32" alt=""></a>
+                </div>
+                <div class="span-23 last">
+                    <h1 class="title">
+                        <a href="{% url home %}"><img src="{% url static path="identity_title.png" %}" alt="Identity"></a>
+                    </h1>
+                </div>
+            </div>
         </div>
-        <div class="span-23 last">
-            <h1 class="title"><span>Identity</span></h1>
+
+        <div class="grid">
+            {% block content %}
+                {% if flash %}
+                    {% for key, message in flash.items %}
+                        <div class="span-24 last flash-message flash-{{ key }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endblock %}
         </div>
     </div>
 
-    <div class="grid">
-        {% block body %}
-        {% endblock %}
+    <div id="footer">
+        <div class="grid">
+            <p>this project's source can be found on <a
+            href="http://github.com/sivy/idact-identity">Github</a>.</p>
+        </div>
     </div>
-
-    <p class="footer">
-        this project's source can be found on <a href="http://github.com/sivy/idact-identity">Github</a>.
-    </p>
 
 </body></html>

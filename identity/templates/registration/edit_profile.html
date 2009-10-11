@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div class="span-24 last">
+        <h1>Edit {{ user.username }}'s profile</h1>
+
+        {{ block.super }}
+
+        <form method="POST" action="{% url identity.views.edit_profile %}">
+            {{ user_form.as_p }}
+            {{ profile_form.as_p }}
+            <p>
+                <input type="submit" value="Save changes">
+                <a href="{% url home %}">Cancel</a>
+            </p>
+        </form>
+    </div>
+
+{% endblock %}

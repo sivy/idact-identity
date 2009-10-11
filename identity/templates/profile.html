@@ -8,20 +8,40 @@
 <link rel="openid2.provider" href="{% absoluteurl %}{% url identity.views.endpoint %}{% endabsoluteurl %}">
 {% endblock %}
 
-{% block body %}
+{% block content %}
 
     <div class="span-24">
         <h1>
-            {% if profile_user.name %}
-                {{ profile_user.name }}
+            {% if profile_user.first_name %}
+                {{ profile_user.first_name }} {{ profile_user.last_name }}
             {% else %}
                 {{ profile_user.username }}
             {% endif %}
         </h1>
 
+        {{ block.super }}
+
         <p>{% absoluteurl %}{% url profile username=profile_user.username %}{% endabsoluteurl %}</p>
 
-        <p>This is an OpenID!</p>
+        {% ifequal user profile_user %}
+            <p>This is <strong>your</strong> OpenID! Would you like to:</p>
+
+            <ul>
+                <li><a href="{% url identity.views.edit_profile %}">Edit your profile</a></li>
+                <li><a href="{% url django.contrib.auth.views.logout %}">Sign out</a></li>
+            </ul>
+        {% else %}
+            <p>This is an OpenID!</p>
+        {% endifequal %}
+
+        <h2>Activity</h2>
+
+        {% for act in profile_user.activity_set.all %}
+            {% if forloop.first %}<ul>{% endif %}
+            <li>{{ act.text }} <a class="arrow" href="{{ act.link }}">&#10148;</a></li>
+            {% if forloop.last %}</ul>{% endif %}
+        {% endfor %}
+
     </div>
 
 {% endblock %}

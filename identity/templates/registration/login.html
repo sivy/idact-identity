@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 
-{% block body %}
+{% block content %}
+
+    {{ block.super }}
 
     <div class="span-8 prefix-8 box">
         <form method="post" action="{% url django.contrib.auth.views.login %}">

@@ -23,6 +23,7 @@ from xml.etree import ElementTree
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, Http404, HttpResponseRedirect, HttpResponseNotFound
 from django.shortcuts import render_to_response
@@ -37,16 +38,30 @@ from openid.server.trustroot import verifyReturnTo
 from openid.yadis.constants import YADIS_CONTENT_TYPE
 from openid.yadis.discover import DiscoveryFailure
 
-from identity.models import Profile, ActivitySubscription, SaveActivityHookToken, OpenIDStore
+from identity.forms import UserCreationForm, UserForm, ProfileForm
+from identity.models import Profile, Activity, ActivitySubscription, SaveActivityHookToken, OpenIDStore
 
 
 log = logging.getLogger(__name__)
+
+
+def login_verboten(fn):
+    @wraps(fn)
+    def test(request, *args, **kwargs):
+        if request.user.is_authenticated():
+            return HttpResponseRedirect(reverse('home'))
+        return fn(request, *args, **kwargs)
+    return test
 
 
 def home(request):
     """
     Respond to requests for the server's primary web page.
     """
+    if request.user.is_authenticated():
+        return HttpResponseRedirect(reverse('profile',
+            kwargs={'username': request.user.username}))
+
     return render_to_response(
         'index.html',
         {},
@@ -76,8 +91,56 @@ def logged_in(request):
     return HttpResponseRedirect(reverse('profile', kwargs={'username': request.user.username}))
 
 
+@login_verboten
 def register(request):
-    raise NotImplementedError
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            new_user = authenticate(username=form.cleaned_data['username'],
+                password=form.cleaned_data['password1'])
+            login(request, new_user)
+            request.flash.put(message="Congratulations, you've registered!")
+            return HttpResponseRedirect(reverse('identity.views.edit_profile'))
+    else:
+        form = UserCreationForm()
+
+    return render_to_response(
+        'registration/register.html',
+        {
+            'form': form,
+        },
+        context_instance=RequestContext(request),
+    )
+
+
+@login_required
+def edit_profile(request):
+    try:
+        profile = request.user.get_profile()
+    except Profile.DoesNotExist:
+        profile = Profile(user=request.user)
+
+    if request.method == 'POST':
+        uform = UserForm(request.POST, instance=request.user)
+        pform = ProfileForm(request.POST, instance=profile)
+        if uform.is_valid() and pform.is_valid():
+            uform.save()
+            pform.save()
+            request.flash.put(message="Your changes have been saved.")
+            return HttpResponseRedirect(reverse('home'))
+    else:
+        uform = UserForm(instance=request.user)
+        pform = ProfileForm(instance=profile)
+
+    return render_to_response(
+        'registration/edit_profile.html',
+        {
+            'user_form': uform,
+            'profile_form': pform,
+        },
+        context_instance=RequestContext(request),
+    )
 
 
 # Activity stream hook views
@@ -177,8 +240,16 @@ def new_activity(request, token):
         return HttpResponse("Unknown hub mode %r" % mode, status=400,
             content_type='text/plain')
 
-    # Handle new content!
-    raise NotImplementedError
+    feed = ElementTree.fromstring(request.raw_post_data)
+    entries = feed.findall('{http://www.w3.org/2005/Atom}entry')
+    if entries is None:
+        raise ValueError('No entries in this feed')
+    for entry in entries:
+        act = Activity.from_atom_entry(entry, request)
+        if not act.pk:
+            act.save()
+
+    return HttpResponse('HOK!', content_type='text/plain')
 
 
 # OpenID views

@@ -6,6 +6,7 @@ urlpatterns = patterns('identity.views',
     url(r'^logged_in$', 'logged_in'),
     url(r'^user/(?P<username>.*)$', 'profile', name='profile'),
     url(r'^register$', 'register', name='register'),
+    url(r'^edit_profile$', 'edit_profile'),
 )
 
 
