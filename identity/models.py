@@ -322,7 +322,7 @@ class OpenIDStore(interface.OpenIDStore):
             email     = fr.getSingle('http://axschema.org/contact/email')
             # if the id provider returns an activity callback, 
             # we'll post the user's activity stream there
-            callback  = fr.getSingle('http://schema.activitystrea.ms/activity/callback')
+            callback  = fr.getSingle('http://activitystrea.ms/axschema/callback')
             if firstname is not None and lastname is not None:
                 p.name = ' '.join((firstname, lastname))
             elif firstname is not None:
