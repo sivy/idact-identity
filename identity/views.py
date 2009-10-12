@@ -384,7 +384,7 @@ def show_decide_page(request, openid_request):
         trust_root_validity = 'trust_root_unreachable'
 
     ax_request = ax.FetchRequest.fromOpenIDRequest(openid_request)
-    if ax_request and ax_request.has_key('http://schema.activitystrea.ms/activity/callback'):
+    if ax_request and ax_request.has_key('http://activitystrea.ms/axschema/callback'):
         ax_request.has_activity_callback = True
 
     return render_to_response(
@@ -439,7 +439,7 @@ def process_trust_result(request):
             callback = reverse('identity.views.save_activity_hook',
                 kwargs={'token': token.token})
             callback = request.build_absolute_uri(callback)
-            ax_data['http://schema.activitystrea.ms/activity/callback'] = callback
+            ax_data['http://activitystrea.ms/axschema/callback'] = callback
             log.debug('Adding %r to AX response as callback', callback)
         else:
             log.debug('User chose not to share activity, so not sending callback')
