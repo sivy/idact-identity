@@ -149,6 +149,7 @@ def save_activity_hook(request, token):
     log.debug('Hello from save_activity_hook!')
 
     def error(msg, *args):
+        log.error(msg % args)
         return HttpResponse(msg % args, status=400, content_type='text/plain')
 
     try:
@@ -169,7 +170,7 @@ def save_activity_hook(request, token):
                 resp.reason)
 
         feed = ElementTree.fromstring(content)
-        log.debug(content)
+        #log.debug(content)
         # "feed" is already the root feed element, so look for the links
         # it contains.
         feed_links = feed.findall('{http://www.w3.org/2005/Atom}link')
@@ -217,6 +218,8 @@ def save_activity_hook(request, token):
         return error("Could not save activity hook for %r due to %s: %s",
             feed_uri, type(exc).__name__, str(exc))
 
+    log.debug("Subscribed to feed %r using cb %r", self_uri, callback_url)
+
     # If you say so, boss!
     return HttpResponse("HOK!", content_type='text/plain')
 
@@ -232,6 +235,7 @@ def new_activity(request, token):
             feed_uri=topic, token=token).count() > 0 else False
 
         mode = request.GET['hub.mode']
+        log.debug('Got verification request for mode %r on topic %r', mode, topic)
         if mode == 'subscribe':
             return success if subscription_exists else failure
         elif mode == 'unsubscribe':
@@ -240,14 +244,20 @@ def new_activity(request, token):
         return HttpResponse("Unknown hub mode %r" % mode, status=400,
             content_type='text/plain')
 
-    feed = ElementTree.fromstring(request.raw_post_data)
-    entries = feed.findall('{http://www.w3.org/2005/Atom}entry')
-    if entries is None:
-        raise ValueError('No entries in this feed')
-    for entry in entries:
-        act = Activity.from_atom_entry(entry, request)
-        if not act.pk:
-            act.save()
+    log.debug('Got pushed some feed data to %r!', request.build_absolute_uri())
+
+    try:
+        feed = ElementTree.fromstring(request.raw_post_data)
+        entries = feed.findall('{http://www.w3.org/2005/Atom}entry')
+        if entries is None:
+            raise ValueError('No entries in this feed')
+        for entry in entries:
+            act = Activity.from_atom_entry(entry, request)
+            if not act.pk:
+                act.save()
+    except Exception, exc:
+        log.exception(exc)
+        raise
 
     return HttpResponse('HOK!', content_type='text/plain')
 
