@@ -62,6 +62,7 @@ a.arrow:hover {
 
 #footer {
     display: block;
+    position: relative;
     height: 38px;
     z-index: 4;
     overflow: visible;
@@ -69,3 +70,24 @@ a.arrow:hover {
     margin: 50px auto 0;
     padding: 0;
 }
+
+#github-ribbon {
+    position: absolute;
+    float: right;
+    display: block;
+    right: 0px;
+    bottom: -12px;
+    width: 200px;
+    height: 200px;
+    text-decoration: none;
+    background: url(big-gray-ribbon.png) no-repeat -20px -20px;
+}
+
+a:link, a:hover, a:visited, a:active {
+    outline: none;
+}
+
+#github-ribbon span {
+    visibility: hidden;
+}
+
