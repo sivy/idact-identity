@@ -62,7 +62,7 @@ class Profile(models.Model):
 
 class Activity(models.Model):
 
-    atom_id = models.CharField(max_length=500, unique=True)
+    atom_id = models.CharField(max_length=255, unique=True)
     subject = models.ForeignKey(User)
     link = models.URLField()
     text = models.TextField()
