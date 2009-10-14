@@ -187,8 +187,9 @@ def save_activity_hook(request, token):
         hub_uri = feed_links_by_rel['hub'].get('href')
 
         # Done enough to think we subscribed (and generate the sub token).
+        user = token_obj.user
         sub = ActivitySubscription(
-            user=token_obj.user,
+            user=user,
             feed_uri=self_uri,
         )
         sub.save()
@@ -210,6 +211,8 @@ def save_activity_hook(request, token):
                 " wasn't accepted by pubsub hub and i feel like sharing")
 
         token_obj.delete()
+
+        user.message_set.create(message="We subscribed to your activity feed at %s!" % feed_uri)
     except SaveActivityHookToken.DoesNotExist:
         return error("Could not save activity hook for %r due to invalid token %r",
             feed_uri, token)
