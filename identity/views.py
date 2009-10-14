@@ -101,6 +101,15 @@ def register(request):
                 password=form.cleaned_data['password1'])
             login(request, new_user)
             request.flash.put(message="Congratulations, you've registered!")
+
+            act = Activity(
+                atom_id='tag:identity,2009:%d' % new_user.pk,
+                subject=new_user,
+                link=reverse('profile', kwargs={'username': new_user.username}),
+                text="%s joined the site" % new_user.username,
+            )
+            act.save()
+
             return HttpResponseRedirect(reverse('identity.views.edit_profile'))
     else:
         form = UserCreationForm()
