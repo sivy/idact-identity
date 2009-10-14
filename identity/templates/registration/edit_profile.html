@@ -10,7 +10,7 @@
         <form method="POST" action="{% url identity.views.edit_profile %}">
             {{ user_form.as_p }}
             {{ profile_form.as_p }}
-            <p>
+            <p class="buttons">
                 <input type="submit" value="Save changes">
                 <a href="{% url home %}">Cancel</a>
             </p>

@@ -116,3 +116,24 @@ a:link, a:hover, a:visited, a:active {
     visibility: hidden;
 }
 
+form label {
+    float: left;
+    width: 8em;
+    margin-right: 0.5em;
+}
+
+form .field-input {
+    float: left;
+    margin-right: 0.5em;
+}
+
+form .field-help {
+    float: left;
+    width: 30em;
+    color: #999;
+    font-size: 0.8em;
+}
+
+form p.buttons {
+    margin-left: 8.5em;
+}

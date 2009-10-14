@@ -1,13 +1,37 @@
 {% extends "base.html" %}
 
+{% block head %}
+<style type="text/css">
+    form label {
+        width: 11em;
+    }
+
+    form p.buttons {
+        margin-left: 11.5em;
+    }
+
+</style>
+{% endblock %}
+
 {% block content %}
 
     <div class="span-24">
         <h1>Register</h1>
 
         <form method="POST" action="{% url register %}">
-            {{ form.as_p }}
-            <p><input type="submit" value="Register"></p>
+            {% for field in form %}
+                {% if field.errors %}
+                    {{ field.errors }}
+                {% endif %}
+                <p class="pkg">
+                    <label for="id_{{ field.html_name }}">{{ field.label }}:</label>
+                    <span class="field-input">{{ field }}</span>
+                    {% if field.help_text %}
+                        <span class="field-help">{{ field.help_text }}</span>
+                    {% endif %}
+                </p>
+            {% endfor %}
+            <p class="buttons"><input type="submit" value="Register"></p>
         </form>
     </div>
 
