@@ -10,6 +10,25 @@ body {
     font-size: 1.6em; 
 }
 
+.pkg:after,
+.field:after {
+    content: " ";
+    display: block;
+    visibility: hidden;
+    clear: both;
+    height: 0.1px;
+    font-size: 0.1em;
+    line-height: 0;
+}
+.pkg,
+.field { display: inline-block; }
+/* no ie mac \*/
+* html .pkg,
+* html .field { height: 1%; }
+.pkg,
+.field { display: block; }
+/* */
+
 h1.title {
     padding: 0;
     margin: 10px 0 0 0;
@@ -46,7 +65,8 @@ a.arrow:hover {
 }
 
 #banner {
-    border-top: 12px solid #69c2e3;
+    padding: 12px 0;
+    background: #69c2e3;
 }
 
 #page {
