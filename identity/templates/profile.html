@@ -2,39 +2,47 @@
 {% load idact %}
 
 {% block head %}
-<!-- We should be able to space-separate both rel values in one attribute,
-     but some older OpenID implementations don't parse that. -->
 <link rel="openid.server" href="{% absoluteurl %}{% url identity.views.endpoint %}{% endabsoluteurl %}">
 <link rel="openid2.provider" href="{% absoluteurl %}{% url identity.views.endpoint %}{% endabsoluteurl %}">
+
+<style type="text/css">
+    .openid-link a:link, .openid-link a:hover, .openid-link a:visited, .openid-link a:active {
+        color: black;
+        text-decoration: none;
+    }
+    .openid-link a:hover {
+        text-decoration: underline;
+    }
+    #profile-name img {
+        vertical-align: middle;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
 
-    <div class="span-24">
-        <h1>
+    <div class="span-24 last">
+        <h1 id="profile-name">
+            <img src="{% url static path="avatars/waffle_32.png" %}" width="32" height="32">
+
             {% if profile_user.first_name %}
                 {{ profile_user.first_name }} {{ profile_user.last_name }}
             {% else %}
                 {{ profile_user.username }}
             {% endif %}
         </h1>
+    </div>
+
+    <div class="push-1 span-23 last">
 
         {{ block.super }}
 
-        <p>{% absoluteurl %}{% url profile username=profile_user.username %}{% endabsoluteurl %}</p>
+        <p class="openid-link">
+            <a href="{% url profile username=profile_user.username %}"><img src="{% url static path="openid.png" %}" width="16" height="16" alt=""></a>
+            <a href="{% url profile username=profile_user.username %}">{% absoluteurl %}{% url profile username=profile_user.username %}{% endabsoluteurl %}</a>
+        </p>
 
-        {% ifequal user profile_user %}
-            <p>This is <strong>your</strong> OpenID! Would you like to:</p>
-
-            <ul>
-                <li><a href="{% url identity.views.edit_profile %}">Edit your profile</a></li>
-                <li><a href="{% url django.contrib.auth.views.logout %}">Sign out</a></li>
-            </ul>
-        {% else %}
-            <p>This is an OpenID!</p>
-        {% endifequal %}
-
-        <h2>Activity</h2>
+        <h3>Recent activity</h3>
 
         {% for act in profile_user.activity_set.all %}
             {% if forloop.first %}<ul>{% endif %}
