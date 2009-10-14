@@ -20,7 +20,7 @@
                     </h1>
                 </div>
 
-                {% if user %}
+                {% if user.is_authenticated %}
                 <div class="span-7 last">
                     <p>
                         Hi, <a href="{% url profile username=user.username %}">{% if user.first_name %}{{ user.first_name }}{% else %}{{ user.username }}{% endif %}</a>!
