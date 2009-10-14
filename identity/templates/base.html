@@ -14,11 +14,24 @@
                 <div class="span-1 title-icon">
                     <a href="{% url home %}"><img src="{% url static path="cloud_white_32.png" %}" width="32" height="32" alt=""></a>
                 </div>
-                <div class="span-23 last">
+                <div class="span-16">
                     <h1 class="title">
                         <a href="{% url home %}"><img src="{% url static path="identity_title.png" %}" alt="Identity"></a>
                     </h1>
                 </div>
+
+                {% if user %}
+                <div class="span-7 last">
+                    <p>
+                        Hi, <a href="{% url profile username=user.username %}">{% if user.first_name %}{{ user.first_name }}{% else %}{{ user.username }}{% endif %}</a>!
+                        <br>
+                        <a href="{% url identity.views.edit_profile %}">Edit your profile</a>
+                        <br>
+                        <a href="{% url django.contrib.auth.views.logout %}">Sign out</a>
+                    </p>
+                </div>
+                {% endif %}
+
             </div>
         </div>
 

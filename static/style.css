@@ -69,6 +69,11 @@ a.arrow:hover {
     background: #69c2e3;
 }
 
+#banner p {
+    margin: 0;
+    padding: 0;
+}
+
 #page {
     min-height: 100%;
     margin: 0 auto -100px;
