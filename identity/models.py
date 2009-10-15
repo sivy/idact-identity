@@ -52,7 +52,9 @@ class Profile(models.Model):
         user = self.user
         ax_data = {
             'http://axschema.org/namePerson/first': user.first_name,
-            'http://axschema.org/namePerson/last': user.last_name
+            'http://axschema.org/namePerson/last': user.last_name,
+            'http://axschema.org/media/image/default': self.avatar,
+            'http://axschema.org/media/image/aspect11': self.avatar,
         }
 
         if share_email:

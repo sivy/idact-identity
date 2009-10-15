@@ -480,7 +480,7 @@ def process_trust_result(request):
         ax_req = ax.FetchRequest.fromOpenIDRequest(openid_request)
         ax_resp = ax.FetchResponse(ax_req)
         for uri, value in ax_data.items():
-            if value:
+            if value and uri in ax_req:
                 ax_resp.addValue(uri, value)
         openid_response.addExtension(ax_resp)
 
