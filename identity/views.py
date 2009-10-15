@@ -125,10 +125,15 @@ def register(request):
 
 @login_required
 def edit_profile(request):
+    avatars = [request.build_absolute_uri(reverse('static', kwargs={'path': 'avatars/%s_32.png' % av})) for av in
+        ('waffle', 'smiley', 'Frank', 'Pete', 'necktie',
+         'blueberry_puzzled', 'orange_with-it', 'watermelon_grumpy', 'strawberry_happy')]
+
     try:
         profile = request.user.get_profile()
     except Profile.DoesNotExist:
         profile = Profile(user=request.user)
+        profile.avatar = avatars[0]
 
     if request.method == 'POST':
         uform = UserForm(request.POST, instance=request.user)
@@ -147,6 +152,8 @@ def edit_profile(request):
         {
             'user_form': uform,
             'profile_form': pform,
+            'current_avatar': pform.initial['avatar'],
+            'avatar_choices': avatars,
         },
         context_instance=RequestContext(request),
     )

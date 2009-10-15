@@ -9,6 +9,12 @@
     display: none;
     font-size: 0.8em;
 }
+.field-avatar img {
+    padding: 10px;
+}
+.field-avatar img.selected {
+    background: #69c2e3;
+}
 </style>
 {% endblock %}
 
@@ -21,7 +27,23 @@
 
         <form method="POST" action="{% url identity.views.edit_profile %}">
             {{ user_form.as_p }}
-            {{ profile_form.as_p }}
+
+            {% for field in profile_form %}
+                <p class="pkg">
+                    <label for="id_{{ field.html_name }}">{{ field.label }}:</label>
+                    {% ifequal field.html_name "avatar" %}
+                        <span id="field-avatar-{{ field.html_name }}" class="field-input field-avatar">
+                            <input type="hidden" id="id_{{ field.html_name }}" name="{{ field.html_name }}" value="{{ current_avatar }}">
+                            {% for choice in avatar_choices %}
+                                <img src="{{ choice }}" {% ifequal choice current_avatar %}class="selected"{% endifequal %} width="32" height="32" alt="">
+                            {% endfor %}
+                        </span>
+                    {% else %}
+                        <span class="field-input">{{ field }}</span>
+                    {% endifequal %}
+                </p>
+            {% endfor %}
+
             <p class="buttons">
                 <input type="submit" value="Save changes">
                 <a href="{% url home %}">Cancel</a>
@@ -34,6 +56,15 @@
             $('#id_dob').datepicker({
                 changeYear: true,
             });
+
+            $('form .field-avatar img').click(function () {
+                var img = $(this);
+                var span = img.parent();
+                span.children('input').attr('value', img.attr('src'));
+                span.children('.selected').removeClass('selected');
+                img.addClass('selected');
+            });
+
         });
     </script>
 

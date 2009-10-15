@@ -24,6 +24,7 @@ TOKEN_CHARS = string.letters + string.digits + string.digits
 class Profile(models.Model):
 
     user = models.ForeignKey(User, unique=True)
+    avatar = models.CharField(max_length=255)
     dob = models.DateField("Date of birth", blank=True, null=True)
     gender = models.CharField(max_length=1, blank=True)
     postcode = models.CharField(max_length=10, blank=True)
