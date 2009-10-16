@@ -26,24 +26,25 @@
     {% endif %}
 
     {% if trust_root_valid or trust_root_undiscovered %}
-        <h3>Sign in to {{ trust_root }}</h3>
+        <h3>Sign in to <em>{{ site_name }}</em></h3>
 
         <div class="yay">
             <!-- Trust root has been validated by OpenID 2 mechanism. -->
-            <p>The site <tt>{{ trust_root }}</tt> has requested verification
+            <p>The site <em>{{ site_name }}</em> has requested verification
             of your OpenID.</p>
 
             {% if trust_root_undiscovered %}
-                <p>(The site at {{ trust_root }} couldn't verify for us that
-                it made the request. Make sure when using {{ trust_root }} that you're
-                contacting the real {{ trust_root }} web site.)</p>
+                <p>(The site at {{ site_name }} couldn't verify for us that it
+                made the request. Make sure when using {{ site_name }} that
+                you're contacting the real {{ site_name }} web site at <tt>{{
+                trust_root }}</tt>.)</p>
             {% endif %}
         </div>
 
         <form method="post" action="{% url identity.views.process_trust_result %}">
             {% include "ax_request_info.html" %}
 
-            <p>Sign in to {{ trust_root }}?</p>
+            <p>Sign in to <em>{{ site_name }}?</em></p>
 
             <p>
                 <input type="submit" value="Yes, sign in" name="allow">

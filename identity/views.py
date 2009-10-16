@@ -18,9 +18,11 @@ Some code conventions used here:
 import cgi
 from functools import wraps
 import logging
+import re
 from urllib import urlencode
 from xml.etree import ElementTree
 
+from BeautifulSoup import BeautifulSoup
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
@@ -408,6 +410,21 @@ def show_decide_page(request, openid_request):
     except HTTPFetchingError:
         trust_root_validity = 'trust_root_unreachable'
 
+    site_name = trust_root
+    site_name = re.sub(r'^http://', '', site_name)
+    site_name = re.sub(r'^([^/]+)/$', r'\1', site_name)
+
+    if trust_root_validity in ('trust_root_valid', 'trust_root_undiscovered'):
+        try:
+            resp, cont = httplib2.Http().request(trust_root)
+            assert resp['content-type'].startswith('text/html')
+            soup = BeautifulSoup(cont)
+            trust_root_title = soup.title.string
+        except Exception:
+            pass
+        else:
+            site_name = trust_root_title
+
     ax_request = ax.FetchRequest.fromOpenIDRequest(openid_request)
     if ax_request and ax_request.has_key('http://activitystrea.ms/axschema/callback'):
         ax_request.has_activity_callback = True
@@ -418,6 +435,7 @@ def show_decide_page(request, openid_request):
             'trust_root': trust_root,
             trust_root_validity: True,
             'ax_request': ax_request,
+            'site_name': site_name,
         },
         context_instance=RequestContext(request),
     )
