@@ -127,6 +127,12 @@ form .field-input {
     margin-right: 0.5em;
 }
 
+form .field-input label {
+    float: none;
+    width: auto;
+    margin-right: 0;
+}
+
 form .field-help {
     float: left;
     width: 30em;
