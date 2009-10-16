@@ -24,10 +24,8 @@ TOKEN_CHARS = string.letters + string.digits + string.digits
 class Profile(models.Model):
 
     user = models.ForeignKey(User, unique=True)
+    nickname = models.CharField(max_length=50, blank=True)
     avatar = models.CharField(max_length=255)
-    dob = models.DateField("Date of birth", blank=True, null=True)
-    gender = models.CharField(max_length=1, blank=True)
-    postcode = models.CharField(max_length=10, blank=True)
     country = models.CharField(max_length=2, blank=True)
     language = models.CharField(max_length=3, blank=True)
     timezone = models.CharField(max_length=50, blank=True)
@@ -35,15 +33,10 @@ class Profile(models.Model):
     def as_sreg_data(self, share_email=False):
         user = self.user
         sreg_data = {
-            'nickname': user.username,
+            'nickname': self.nickname or user.username,
         }
-        if user.first_name or user.last_name:
-            sreg_data['fullname'] = ' '.join((user.first_name, user.last_name)).strip()
 
-        if share_email:
-            sreg_data['email'] = user.email
-
-        for fld in ('dob', 'gender', 'postcode', 'country', 'language', 'timezone'):
+        for fld in ('country', 'language', 'timezone'):
             sreg_data[fld] = getattr(self, fld, None)
 
         return sreg_data
@@ -51,14 +44,10 @@ class Profile(models.Model):
     def as_ax_data(self, share_email=False):
         user = self.user
         ax_data = {
-            'http://axschema.org/namePerson/first': user.first_name,
-            'http://axschema.org/namePerson/last': user.last_name,
+            'http://axschema.org/namePerson/friendly': self.nickname or user.username,
             'http://axschema.org/media/image/default': self.avatar,
             'http://axschema.org/media/image/aspect11': self.avatar,
         }
-
-        if share_email:
-            ax_data['http://axschema.org/contact/email'] = user.email
 
         return ax_data
 

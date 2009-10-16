@@ -38,7 +38,7 @@ from openid.server.trustroot import verifyReturnTo
 from openid.yadis.constants import YADIS_CONTENT_TYPE
 from openid.yadis.discover import DiscoveryFailure
 
-from identity.forms import UserCreationForm, UserForm, ProfileForm
+from identity.forms import UserCreationForm, ProfileForm
 from identity.models import Profile, Activity, ActivitySubscription, SaveActivityHookToken, OpenIDStore
 
 
@@ -136,23 +136,19 @@ def edit_profile(request):
         profile.avatar = avatars[0]
 
     if request.method == 'POST':
-        uform = UserForm(request.POST, instance=request.user)
-        pform = ProfileForm(request.POST, instance=profile)
-        if uform.is_valid() and pform.is_valid():
-            uform.save()
-            pform.save()
+        form = ProfileForm(request.POST, instance=profile)
+        if form.is_valid():
+            form.save()
             request.flash.put(message="Your changes have been saved.")
             return HttpResponseRedirect(reverse('home'))
     else:
-        uform = UserForm(instance=request.user)
-        pform = ProfileForm(instance=profile)
+        form = ProfileForm(instance=profile)
 
     return render_to_response(
         'registration/edit_profile.html',
         {
-            'user_form': uform,
-            'profile_form': pform,
-            'current_avatar': pform.initial['avatar'],
+            'profile_form': form,
+            'current_avatar': form.initial['avatar'],
             'avatar_choices': avatars,
         },
         context_instance=RequestContext(request),

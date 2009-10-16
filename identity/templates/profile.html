@@ -25,8 +25,8 @@
         <h1 id="profile-name">
             <img src="{% if profile_user.get_profile.avatar %}{{ profile_user.get_profile.avatar }}{% else %}{% url static path="avatars/waffle_32.png" %}{% endif %}" width="32" height="32">
 
-            {% if profile_user.first_name %}
-                {{ profile_user.first_name }} {{ profile_user.last_name }}
+            {% if profile_user.get_profile.nickname %}
+                {{ profile_user.get_profile.nickname }}
             {% else %}
                 {{ profile_user.username }}
             {% endif %}

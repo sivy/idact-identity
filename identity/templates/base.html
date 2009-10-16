@@ -23,7 +23,7 @@
                 {% if user.is_authenticated %}
                 <div class="span-7 last">
                     <p>
-                        Hi, <a href="{% url profile username=user.username %}">{% if user.first_name %}{{ user.first_name }}{% else %}{{ user.username }}{% endif %}</a>!
+                        Hi, <a href="{% url profile username=user.username %}">{% if user.get_profile.nickname %}{{ user.get_profile.nickname }}{% else %}{{ user.username }}{% endif %}</a>!
                         <br>
                         <a href="{% url identity.views.edit_profile %}">Edit your profile</a>
                         <br>

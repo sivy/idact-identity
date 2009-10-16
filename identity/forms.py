@@ -7,13 +7,6 @@ from identity.models import Profile
 from identity import localflavor
 
 
-class UserForm(forms.ModelForm):
-
-    class Meta:
-        model = User
-        fields = ('first_name', 'last_name', 'email')
-
-
 class MaybeChoiceField(forms.ChoiceField):
 
     def __init__(self, required=False, choices=None, **kwargs):
@@ -27,11 +20,6 @@ class MaybeChoiceField(forms.ChoiceField):
 
 class ProfileForm(forms.ModelForm):
 
-    gender = MaybeChoiceField(choices=(
-        ('F', 'Female'),
-        ('M', 'Male'),
-        ('O', 'Other'),
-    ))
     country = MaybeChoiceField(choices=pytz.country_names.items())
     language = MaybeChoiceField(choices=sorted(
         localflavor.LANGUAGE_NAME_FOR_CODE.items(), key=lambda x: x[1]))
